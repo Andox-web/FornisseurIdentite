@@ -1,81 +1,86 @@
-CREATE TABLE utilisateurs (
+
+CREATE TABLE utilisateur (
     id SERIAL PRIMARY KEY,
-    nom VARCHAR(100) NOT NULL,
-    prenom VARCHAR(100) NOT NULL,
+    nom VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
-    mot_de_passe TEXT NOT NULL,
-    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    motdepasse TEXT NOT NULL,
+    datecreation  TIMESTAMP  DEFAULT NULL,
+    codecreation TEXT UNIQUE NOT NULL 
 );
 
-CREATE TABLE roles (
+CREATE TABLE role (
     id SERIAL PRIMARY KEY,
     nom VARCHAR(50) UNIQUE NOT NULL
 );
 
-CREATE TABLE utilisateur_roles (
+CREATE TABLE utilisateurrole (
     id SERIAL PRIMARY KEY,
-    utilisateur_id INT NOT NULL REFERENCES utilisateurs(id) ON DELETE CASCADE,
-    role_id INT NOT NULL REFERENCES roles(id) ON DELETE CASCADE
+    utilisateurid INT NOT NULL REFERENCES utilisateur(id) ON DELETE CASCADE,
+    roleid INT NOT NULL REFERENCES role(id) ON DELETE CASCADE
 );
 
-CREATE TABLE statuts (
+CREATE TABLE statut (
     id SERIAL PRIMARY KEY,
     nom VARCHAR(50) UNIQUE NOT NULL,
     description TEXT
 );
 
-CREATE TABLE utilisateur_statuts (
+CREATE TABLE utilisateurstatut (
     id SERIAL PRIMARY KEY,
-    utilisateur_id INT NOT NULL REFERENCES utilisateurs(id) ON DELETE CASCADE,
-    statut_id INT NOT NULL REFERENCES statuts(id) ON DELETE CASCADE,
-    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    utilisateurid INT NOT NULL REFERENCES utilisateur(id) ON DELETE CASCADE,
+    statutid INT NOT NULL REFERENCES statut(id) ON DELETE CASCADE,
+    datecreation TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE tentatives_connexion (
+CREATE TABLE tentativesconnexion (
     id SERIAL PRIMARY KEY,
-    utilisateur_id INT NOT NULL REFERENCES utilisateurs(id) ON DELETE CASCADE,
-    compteur_tentative INT NOT NULL,
-    date_tentative TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    utilisateurid INT NOT NULL REFERENCES utilisateur(id) ON DELETE CASCADE,
+    email VARCHAR(255) UNIQUE NOT NULL REFERENCES utilisateur(email) ON DELETE CASCADE,
+    compteurtentative INT NOT NULL,
+    datetentative TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE type_sessions (
+CREATE TABLE typesession (
     id SERIAL PRIMARY KEY,
     nom VARCHAR(50) UNIQUE NOT NULL,
     description TEXT
 );
 
-CREATE TABLE sessions (
+CREATE TABLE session (
     id SERIAL PRIMARY KEY,
-    utilisateur_id INT NOT NULL REFERENCES utilisateurs(id) ON DELETE CASCADE,
-    type_sessions_id INT NOT NULL REFERENCES type_sessions(id) ON DELETE CASCADE,
+    utilisateurid INT NOT NULL REFERENCES utilisateur(id) ON DELETE CASCADE,
+    typesessionid INT DEFAULT 1 REFERENCES typesession(id) ON DELETE CASCADE,
     token TEXT NOT NULL,
-    expire_at TIMESTAMP NOT NULL,
-    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    expireat TIMESTAMP NOT NULL,
+    datecreation TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE authentifications (
+CREATE TABLE authentification (
     id SERIAL PRIMARY KEY,
-    utilisateur_id INT NOT NULL REFERENCES utilisateurs(id) ON DELETE CASCADE,
+    utilisateurid INT NOT NULL REFERENCES utilisateur(id) ON DELETE CASCADE,
+    email VARCHAR(255) NOT NULL REFERENCES utilisateur(email) ON DELETE CASCADE,
     pin TEXT NOT NULL,
-    expire_at TIMESTAMP NOT NULL,
-    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    used BOOLEAN NOT NULL DEFAULT FALSE,
+    expireat TIMESTAMP NOT NULL,
+    datecreation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT unique_email_pin UNIQUE (email, pin)
 );
 
-CREATE TABLE reinitialisations (
+CREATE TABLE reinitialisation (
     id SERIAL PRIMARY KEY,
-    utilisateur_id INT NOT NULL REFERENCES utilisateurs(id) ON DELETE CASCADE,
-    email VARCHAR(255) NOT NULL,
-    code TEXT NOT NULL,
-    expire_at TIMESTAMP NOT NULL,
-    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    utilisateurid INT NOT NULL REFERENCES utilisateur(id) ON DELETE CASCADE,
+    email VARCHAR(255) NOT NULL REFERENCES utilisateur(email) ON DELETE CASCADE,
+    codereinitialisation TEXT UNIQUE NOT NULL,
+    expireat TIMESTAMP NOT NULL,
+    used BOOLEAN NOT NULL DEFAULT FALSE,
+    datecreation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT unique_email_code UNIQUE (email, codereinitialisation)
 );
 
-INSERT INTO roles (nom) VALUES ('admin'), ('membre');
-INSERT INTO statuts (nom, description) VALUES 
-    ('actif', 'Utilisateur actif'),
-    ('inactif', 'Utilisateur inactif'),
-    ('bloqué', 'Utilisateur bloqué');
+INSERT INTO statut (id,nom, description) VALUES 
+    (1,'actif', 'Utilisateur actif'),
+    (2,'inactif', 'Utilisateur inactif'),
+    (3,'bloque', 'Utilisateur bloque');
 
-INSERT INTO type_sessions (nom, description) VALUES 
-    ('connection', 'session pour authentification'),
-    ('action', 'session pour action');
+INSERT INTO typesession (id,nom, description) VALUES 
+    (1,'action', 'session pour action');

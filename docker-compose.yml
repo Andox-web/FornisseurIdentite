@@ -7,6 +7,9 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Username=postgres;Password=postgres;Database=fournisseur
+      - HashingOptions__SaltSize=32
+      - HashingOptions__HashSize=64
+      - HashingOptions__Iterations=150000
     ports:
       - "5000:8080" 
     depends_on:
@@ -22,7 +25,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     volumes:
-      - ./db/base.sql:/docker-entrypoint-initdb.d/base.sql  # Charge le fichier SQL pour initialiser la base de données
+      - ./db/base.sql:/docker-entrypoint-initdb.d/base.sql  
     ports:
       - "5432:5432"
     networks:
