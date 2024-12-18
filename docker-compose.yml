@@ -1,0 +1,34 @@
+services:
+  # Service pour l'API .NET
+  webapi:
+    build:
+      context: FournisseurIdentite/  # Contexte de construction dans le dossier contenant le Dockerfile et le code source
+      dockerfile: Dockerfile         # Fichier Dockerfile dans ce même dossier
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Username=postgres;Password=postgres;Database=fournisseur
+    ports:
+      - "5000:8080" 
+    depends_on:
+      - db  
+    networks:
+      - backend
+
+  # Service pour la base de données PostgreSQL
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: fournisseur
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - ./db/base.sql:/docker-entrypoint-initdb.d/base.sql  # Charge le fichier SQL pour initialiser la base de données
+    ports:
+      - "5432:5432"
+    networks:
+      - backend
+
+# Définition du réseau interne pour les services
+networks:
+  backend:
+    driver: bridge

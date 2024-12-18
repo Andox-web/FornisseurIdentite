@@ -1,0 +1,10 @@
+FournisseurIdentite/bin/
+FournisseurIdentite/obj/
+
+# Ignorer les fichiers de configuration de Visual Studio
+.vscode/
+
+# Ignorer les fichiers de configuration Git
+.git/
+
+fournisseur.sln

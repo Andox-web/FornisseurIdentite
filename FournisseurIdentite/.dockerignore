@@ -1,0 +1,10 @@
+# Ignorer les dossiers de build
+bin/
+obj/
+
+# Ignorer les fichiers de configuration de Visual Studio
+.vscode/
+
+# Ignorer les fichiers de configuration Git
+.git/
+.gitignore
