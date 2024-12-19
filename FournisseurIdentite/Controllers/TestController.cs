@@ -44,18 +44,18 @@ namespace FournisseurIdentite.Controllers
             }
         }
 
-        // Action pour tester la validation de l'utilisateur
-        [HttpGet("validation")]
-        public async Task<IActionResult> TestValidation([FromBody] ValidationModel validationModel)
+                // Action pour tester la validation de l'utilisateur
+       [HttpGet("validation")]
+        public async Task<IActionResult> TestValidation([FromQuery] string code)
         {
             try
             {
-                if (string.IsNullOrEmpty(validationModel.CodeCreation))
+                if (string.IsNullOrEmpty(code))
                 {
                     return BadRequest("Le code de validation est nécessaire.");
                 }
 
-                bool result = await _inscriptionService.ValiderUtilisateur(validationModel.CodeCreation);
+                bool result = await _inscriptionService.ValiderUtilisateur(code);
 
                 if (result)
                 {
