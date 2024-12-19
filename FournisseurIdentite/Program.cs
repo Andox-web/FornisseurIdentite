@@ -1,6 +1,7 @@
 using FournisseurIdentite.Database;
 using Npgsql.EntityFrameworkCore.PostgreSQL;
 using Microsoft.EntityFrameworkCore;
+using FournisseurIdentite.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +13,7 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseLowerCaseNamingConvention()
             .UseNpgsql(Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")));
-
+builder.Services.AddScoped<InscriptionService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

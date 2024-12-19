@@ -11,12 +11,66 @@ namespace FournisseurIdentite.Controllers
     public class TestController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly InscriptionService _inscriptionService;
 
-        public TestController(AppDbContext context)
+        public TestController(AppDbContext context, InscriptionService inscriptionService)
         {
             _context = context;
+            _inscriptionService = inscriptionService;
         }
         
+        [HttpPost("inscription")]
+        public async Task<IActionResult> TestInscription([FromBody] UtilisateurModel utilisateur)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(utilisateur.Nom) || string.IsNullOrEmpty(utilisateur.Email) || string.IsNullOrEmpty(utilisateur.MotDePasse))
+                {
+                    return BadRequest("Tous les champs sont nécessaires.");
+                }
+
+                bool result = await _inscriptionService.InscrireUtilisateur(utilisateur.Nom, utilisateur.Email, utilisateur.MotDePasse);
+
+                if (result)
+                {
+                    return Ok("Inscription réussie. Un email de validation a été envoyé.");
+                }
+
+                return BadRequest("Erreur lors de l'inscription.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "Erreur d'inscription", Error = ex.Message });
+            }
+        }
+
+        // Action pour tester la validation de l'utilisateur
+        [HttpPost("validation")]
+        public async Task<IActionResult> TestValidation([FromBody] ValidationModel validationModel)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(validationModel.CodeCreation))
+                {
+                    return BadRequest("Le code de validation est nécessaire.");
+                }
+
+                bool result = await _inscriptionService.ValiderUtilisateur(validationModel.CodeCreation);
+
+                if (result)
+                {
+                    return Ok("Validation réussie. Votre compte est maintenant actif.");
+                }
+
+                return BadRequest("Code de validation invalide.");
+            }
+            catch (Exception ex)
+            {
+                var innerException = ex.InnerException?.Message ?? "Aucune inner exception disponible.";
+                return StatusCode(500, new { Message = "Erreur de validation", Error = ex.Message, InnerException = innerException });
+            }
+        }
+
         // Action pour tester la connexion à la base de données et insérer des valeurs
         [HttpGet("test")]
         public IActionResult TestConnection()
