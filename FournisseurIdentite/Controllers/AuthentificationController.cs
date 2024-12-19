@@ -40,8 +40,6 @@ namespace FournisseurIdentite.Controllers
                 .Where(a => HashUtility.VerifyHash(pin.ToString(), a.Pin))
                 .FirstOrDefault();
 
-
-
             if (authentification == null)
             {
                 Statut statut = _tentaviveService.incrementTentative(email);
@@ -59,7 +57,6 @@ namespace FournisseurIdentite.Controllers
             
             // Marquer le PIN comme utilisé
             authentification.Used = true;
-            Console.WriteLine("sssss");
             _dbContext.Authentifications.Update(authentification);
             _dbContext.SaveChanges();
 

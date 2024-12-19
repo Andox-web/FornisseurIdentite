@@ -28,7 +28,7 @@ namespace FournisseurIdentite.Utils
             {
                 Nom = nom,
                 Email = email,
-                MotDePasse = HashUtility.GenerateSecureHash(motDePasse), // Hachage du mot de passe
+                MotDePasse = HashUtility.GenerateSecureHash(motDePasse), 
                 CodeCreation = codeCreation
             };
 

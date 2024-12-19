@@ -78,9 +78,8 @@ CREATE TABLE reinitialisation (
 );
 
 INSERT INTO statut (id,nom, description) VALUES 
-    (1,'actif', 'Utilisateur actif'),
-    (2,'inactif', 'Utilisateur inactif'),
-    (3,'bloque', 'Utilisateur bloque');
+    (1,'normal', 'Utilisateur lambda'),
+    (2,'bloque', 'Utilisateur bloque');
 
 INSERT INTO typesession (id,nom, description) VALUES 
     (1,'action', 'session pour action');

@@ -12,14 +12,16 @@ namespace FournisseurIdentite.Controllers
     [ApiController]
     public class TestController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly AppDbContext _dbContext;
         private readonly InscriptionService _inscriptionService;
+        private readonly SessionService _sessionService;
 
-        public TestController(AppDbContext context, InscriptionService inscriptionService)
+        public TestController(AppDbContext context, InscriptionService inscriptionService,SessionService sessionService)
         {
-            _context = context;
+            _dbContext = context;
             _inscriptionService = inscriptionService;
-        
+            _sessionService = sessionService;
+        }
         [HttpPost("inscription")]
         public async Task<IActionResult> TestInscription([FromBody] UtilisateurModel utilisateur)
         {

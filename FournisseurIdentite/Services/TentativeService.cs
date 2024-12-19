@@ -35,7 +35,7 @@ namespace FournisseurIdentite.Services
                     .OrderByDescending(us => us.DateCreation)
                     .FirstOrDefault();
                     
-                    if (utilisateurStatut == null)
+                    if (utilisateurStatut.StatutId != statutBloque.Id || utilisateurStatut == null )
                     {
                         utilisateurStatut = new UtilisateurStatut
                         {
@@ -62,9 +62,39 @@ namespace FournisseurIdentite.Services
                 });
             }
 
-            // Enregistrer les modifications dans la base de données
             _dbContext.SaveChanges();
             return null;
+        }
+        public bool reinitialisation(string email){
+            var tentative = _dbContext.TentativesConnexion
+                    .FirstOrDefault(t => t.Email == email);
+            if (tentative != null || tentative.CompteurTentative == 0){
+               return false;
+            }
+            tentative.CompteurTentative=0;
+
+            var statutNormal = _dbContext.Statuts
+                .FirstOrDefault(s => s.Nom == "normal");
+            
+            var utilisateurStatut = _dbContext.UtilisateurStatuts
+            .Where(us => us.UtilisateurId == tentative.UtilisateurId)
+            .OrderByDescending(us => us.DateCreation)
+            .FirstOrDefault();
+            
+            if (utilisateurStatut != null && utilisateurStatut.StatutId != statutNormal.Id )
+            {
+                utilisateurStatut = new UtilisateurStatut
+                {
+                    UtilisateurId = tentative.UtilisateurId,
+                    StatutId = statutNormal.Id,
+                    DateCreation = DateTime.UtcNow
+                };
+                
+                _dbContext.UtilisateurStatuts.Add(utilisateurStatut);
+            }           
+            
+            _dbContext.SaveChanges();
+            return true;
         }
     }
 }
