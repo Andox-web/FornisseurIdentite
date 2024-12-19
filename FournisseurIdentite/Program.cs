@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using FournisseurIdentite.Utils;
 using FournisseurIdentite.Filters;
 using FournisseurIdentite.Services;
+using System.Reflection;
+using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +13,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddScoped<SessionService>();
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add<SessionFilter>();
@@ -19,7 +20,9 @@ builder.Services.AddControllers(options =>
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseLowerCaseNamingConvention()
             .UseNpgsql(Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")));
-builder.Services.AddScoped<InscriptionService>();
+
+builder.Services.RegisterServices(Assembly.GetExecutingAssembly(), "FournisseurIdentite.Services");
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -34,7 +37,5 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
-
-app.MapGet("/", () => "Bienvenue sur l'API Fournisseur Identité !");
 
 app.Run();
