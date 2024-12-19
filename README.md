@@ -70,10 +70,11 @@ pour demarer , lancer dockercompose -d --build
                     -code_reinitialisation invalide/expire
                     -email non reconnue
 
--### Modification des infos users (mikajy)
-    -url:http://localhost:5000/reinitialisation
+-### Modification des infos users (mikajy) VITA
+    -url:http://localhost:5000/modification
         -header : token
-        -donnee: json utiilisateur(avec seulement seulement les donnee a modifier) , email ,mot de pass
+        -method : put
+        -donnee a entrer: json NewUserInfo (avec les deux donnee a modifier: nom et mdp) , email ,mot de pass
         -responce: 
             -valider: message de confirmation disons que l'utilisateur a ete modifier 
             -refuser: message d'erreur  
@@ -83,9 +84,10 @@ pour demarer , lancer dockercompose -d --build
                     -token invalide
                     -donnee a changer invalide(email)
 
--### Suppresion des infos users (mikajy)
+-### Suppresion des infos users (mikajy)  VITA
     -url:http://localhost:5000/supprimerUtilisateur
         -header : token
+        -methode: delete
         -donnee: email, mot de pass
         -responce: 
             -valider: message de confirmation disons que le compte a ete supprimer 
