@@ -10,6 +10,9 @@ services:
       - HashingOptions__SaltSize=32
       - HashingOptions__HashSize=64
       - HashingOptions__Iterations=150000
+      - SESSIONS_DURATION=90
+      - PIN_DURATION=90
+      - NB_TENTATIVE_MAX=3
     ports:
       - "5000:8080" 
     depends_on:

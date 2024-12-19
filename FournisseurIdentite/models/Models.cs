@@ -143,4 +143,17 @@ namespace FournisseurIdentite.Models
 
         public DateTime DateCreation { get; set; } = DateTime.UtcNow;
     }
+
+    public class UtilisateurModel
+    {
+        public string Nom { get; set; }  = string.Empty;
+        public string Email { get; set; }  = string.Empty;
+        public string MotDePasse { get; set; }  = string.Empty;
+    }
+
+    // Modèle pour la validation
+    public class ValidationModel
+    {
+        public string CodeCreation { get; set; }  = string.Empty;
+    }
 }

@@ -1,12 +1,14 @@
 # FornisseurIdentite
 pour demarer , lancer dockercompose -d --build 
 
+NB:pin,code,mdp seront hasher
+
 -### Inscription (zo)
     -url:http://localhost:5000/inscription
     -donnee : json de utilisateur
     -method : Post
     -responce: 
-        -valider: message de confirmation avec id ,email,nom et demande de confirmer via email 
+        -valider: message de confirmation avec id ,email,nom et demande de confirmer via email (mail contenant lien de Confirmation inscription avec ces donnee)
         -refuser: message d'erreur et renvoye le json utilisateur 
             -erreur possible:
                 -email deja lier a un compte
@@ -53,7 +55,7 @@ pour demarer , lancer dockercompose -d --build
         -donnee : email 
         -method : Get
         -responce: 
-            -valider: message de confirmation disons que la demande de reintilatisation a ete envoyer a l'email 
+            -valider: message de confirmation disons que la demande de reintilatisation a ete envoyer a l'email (contenant lien de reinitialisisation avec ces donnee)
             -refuser: message d'erreur  
                 -erreur possible:
                     -erreur envoye mail
@@ -74,7 +76,7 @@ pour demarer , lancer dockercompose -d --build
     -url:http://localhost:5000/modification
         -header : token
         -method : put
-        -donnee a entrer: json NewUserInfo (avec les deux donnee a modifier: nom et mdp) , email ,mot de pass
+        -donnee a entrer: json NewUserInfo (avec les deux donnee a modifier: nom et mdp) , email ,mot de passe
         -responce: 
             -valider: message de confirmation disons que l'utilisateur a ete modifier 
             -refuser: message d'erreur  
