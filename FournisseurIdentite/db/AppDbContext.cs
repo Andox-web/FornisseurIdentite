@@ -2,6 +2,7 @@ using System;
 using Npgsql;
 using FournisseurIdentite.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FournisseurIdentite.Database
 {
@@ -21,6 +22,8 @@ namespace FournisseurIdentite.Database
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+            
             modelBuilder.Entity<Utilisateur>().ToTable("utilisateur");
             modelBuilder.Entity<Role>().ToTable("role");
             modelBuilder.Entity<UtilisateurRole>().ToTable("utilisateurrole");
@@ -31,6 +34,23 @@ namespace FournisseurIdentite.Database
             modelBuilder.Entity<Session>().ToTable("session");
             modelBuilder.Entity<Authentification>().ToTable("authentification");
             modelBuilder.Entity<Reinitialisation>().ToTable("reinitialisation");
+
+            // Parcourez toutes les entités et appliquez la configuration "timestamp with time zone" aux propriétés DateTime
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                foreach (var property in entityType.GetProperties())
+                {
+                    if (property.ClrType == typeof(DateTime) || property.ClrType == typeof(DateTime?))
+                    {
+                        property.SetColumnType("timestamp with time zone");
+                        property.SetValueConverter(new ValueConverter<DateTime, DateTime>(
+                            v => v.ToUniversalTime(), 
+                            v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
+                        ));
+                    }
+                    
+                }
+            }
         }
     }
 

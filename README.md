@@ -1,6 +1,8 @@
 # FornisseurIdentite
 pour demarer , lancer dockercompose -d --build 
 
+NB:pin,code,mdp seront hasher
+
 -### Inscription (zo)
     -url:http://localhost:5000/inscription
     -donnee : json de utilisateur
