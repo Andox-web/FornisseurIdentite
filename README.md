@@ -6,7 +6,7 @@ pour demarer , lancer dockercompose -d --build
     -donnee : json de utilisateur
     -method : Post
     -responce: 
-        -valider: message de confirmation avec id ,email,nom et demande de confirmer via email 
+        -valider: message de confirmation avec id ,email,nom et demande de confirmer via email (mail contenant lien de Confirmation inscription avec ces donnee)
         -refuser: message d'erreur et renvoye le json utilisateur 
             -erreur possible:
                 -email deja lier a un compte
@@ -53,7 +53,7 @@ pour demarer , lancer dockercompose -d --build
         -donnee : email 
         -method : Get
         -responce: 
-            -valider: message de confirmation disons que la demande de reintilatisation a ete envoyer a l'email 
+            -valider: message de confirmation disons que la demande de reintilatisation a ete envoyer a l'email (contenant lien de reinitialisisation avec ces donnee)
             -refuser: message d'erreur  
                 -erreur possible:
                     -erreur envoye mail
@@ -73,7 +73,7 @@ pour demarer , lancer dockercompose -d --build
 -### Modification des infos users (mikajy)
     -url:http://localhost:5000/reinitialisation
         -header : token
-        -donnee: json utiilisateur(avec seulement seulement les donnee a modifier) , email ,mot de pass
+        -donnee: json utilisateur(avec seulement seulement les donnee a modifier) , email ,mot de pass
         -responce: 
             -valider: message de confirmation disons que l'utilisateur a ete modifier 
             -refuser: message d'erreur  
