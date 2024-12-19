@@ -45,7 +45,7 @@ namespace FournisseurIdentite.Controllers
         }
 
         // Action pour tester la validation de l'utilisateur
-        [HttpPost("validation")]
+        [HttpGet("validation")]
         public async Task<IActionResult> TestValidation([FromBody] ValidationModel validationModel)
         {
             try
