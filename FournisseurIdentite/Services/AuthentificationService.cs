@@ -13,7 +13,13 @@ namespace FournisseurIdentite.Services
         {
             _dbContext = dbContext;
         }
+        // Méthode pour générer un code PIN
 
+        public string GeneratePin()
+        {
+            var random = new Random();
+            return random.Next(100000, 999999).ToString(); // Générer un PIN à 6 chiffres
+        }
         public Authentification InsertAuthentication(int utilisateurId, string pin)
         {
             // Générer un hash sécurisé pour le PIN
@@ -42,5 +48,7 @@ namespace FournisseurIdentite.Services
             // Retourner l'objet Authentification inséré
             return authentification;
         }
+        
     }
+
 }

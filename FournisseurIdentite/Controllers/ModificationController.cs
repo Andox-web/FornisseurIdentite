@@ -2,11 +2,11 @@ using Microsoft.AspNetCore.Mvc;
 using FournisseurIdentite.Models;
 using FournisseurIdentite.Services;
 using System.Threading.Tasks;
+using FournisseurIdentite.Filters;
 
 namespace FournisseurIdentite.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
     public class ModificationController : ControllerBase
     {
         private readonly ModificationService _modificationService;
@@ -16,14 +16,12 @@ namespace FournisseurIdentite.Controllers
             _modificationService = modificationService;
         }
         
-        [HttpPut("modifier")]
+        [HttpPut("modification")]
+        [RequiresSession]
         public IActionResult ModifierUtilisateur([FromQuery] string email, [FromQuery] string motDePasse, [FromBody] NewInfoUser utilisateurMisAJour)
         {
             try
             {
-                Console.WriteLine(email);
-                Console.WriteLine(motDePasse);
-                Console.WriteLine(utilisateurMisAJour.nom, utilisateurMisAJour.motDePasse);
                 bool resultat = _modificationService.ModifierUtilisateur(email, motDePasse, utilisateurMisAJour);
                 if (resultat)
                 {
@@ -40,13 +38,12 @@ namespace FournisseurIdentite.Controllers
             }
         }
 
-        [HttpDelete("supprimer")]
+        [HttpDelete("supprimerUtilisateur")]
+        [RequiresSession]
         public IActionResult SupprimerUtilisateur([FromQuery] string email, [FromQuery] string motDePasse)
         {
             try
             {
-                Console.WriteLine(email);
-                Console.WriteLine(motDePasse);
 
                 bool resultat = _modificationService.SupprimerUtilisateur(email, motDePasse);
                 if (resultat)

@@ -1,3 +1,4 @@
+-- fournisseur d'identite
 
 CREATE TABLE utilisateur (
     id SERIAL PRIMARY KEY,
@@ -83,3 +84,122 @@ INSERT INTO statut (id,nom, description) VALUES
 
 INSERT INTO typesession (id,nom, description) VALUES 
     (1,'action', 'session pour action');
+
+
+-- crypto
+CREATE TABLE cryptomonnaie (
+    id SERIAL PRIMARY KEY,
+    nom VARCHAR(50) NOT NULL,
+    abrev VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE changecrypto (
+    id SERIAL PRIMARY KEY,
+    cryptomonnaieid INT REFERENCES cryptomonnaie(id) ON DELETE CASCADE,
+    valeur NUMERIC(20, 8) NOT NULL,
+    datechangement TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE portemonnaiefiat (
+    id SERIAL PRIMARY KEY,
+    utilisateurid INT NOT NULL REFERENCES utilisateur(id) ON DELETE CASCADE,
+    quantite NUMERIC(20, 8) DEFAULT 0
+);
+
+CREATE TABLE portemonnaiecrypto (
+    id SERIAL PRIMARY KEY,
+    utilisateurid INT NOT NULL REFERENCES utilisateur(id) ON DELETE CASCADE,
+    cryptomonnaieid INT REFERENCES cryptomonnaie(id) ON DELETE CASCADE,
+    quantite NUMERIC(20, 8) DEFAULT 0
+);
+
+CREATE TABLE typefond (
+    id SERIAL PRIMARY KEY,
+    type VARCHAR(50) NOT NULL,
+    description TEXT
+);
+
+INSERT INTO typefond (type, description) 
+VALUES ('depot', 'Depot de fonds'), 
+       ('retrait', 'Retrait de fonds');
+
+CREATE TABLE fond (
+    id SERIAL PRIMARY KEY,
+    utilisateurid INT REFERENCES utilisateur(id) ON DELETE CASCADE,
+    valeur NUMERIC(20, 8) NOT NULL,
+    typefond INT REFERENCES typefond(id) ON DELETE SET NULL,
+    istransaction BOOLEAN DEFAULT FALSE,
+    isvalid BOOLEAN DEFAULT FALSE,
+    codefond TEXT,
+    expireat TIMESTAMP,
+    datefond TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE annoncevente (
+    id SERIAL PRIMARY KEY,
+    vendeurid INT REFERENCES utilisateur(id) ON DELETE CASCADE,
+    cryptomonnaieid INT REFERENCES cryptomonnaie(id) ON DELETE CASCADE,
+    quantite NUMERIC(20, 8) NOT NULL,
+    prix NUMERIC(20, 8) NOT NULL,
+    isvendue BOOLEAN DEFAULT FALSE,
+    date_annonce TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE transaction (
+    id SERIAL PRIMARY KEY,
+    annonceventeid INT REFERENCES annoncevente(id) ON DELETE SET NULL,
+    vendeurid INT REFERENCES utilisateur(id) ON DELETE CASCADE,
+    acheteurid INT REFERENCES utilisateur(id) ON DELETE CASCADE,
+    retraitid INT REFERENCES fond(id) ON DELETE SET NULL,
+    depotid INT REFERENCES fond(id) ON DELETE SET NULL,
+    cryptomonnaieid INT REFERENCES cryptomonnaie(id) ON DELETE CASCADE,
+    quantitecrypto NUMERIC(20, 8) NOT NULL,
+    datetransaction TIMESTAMP DEFAULT NOW()
+);
+
+CREATE OR REPLACE FUNCTION update_portefeuille_fiat()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.typefond = (SELECT id FROM typefond WHERE type = 'depot') THEN
+        UPDATE portemonnaiefiat
+        SET quantite = quantite + NEW.valeur
+        WHERE utilisateurid = NEW.utilisateurid;
+    ELSIF NEW.typefond = (SELECT id FROM typefond WHERE type = 'retrait') THEN
+        UPDATE portemonnaiefiat
+        SET quantite = quantite - NEW.valeur
+        WHERE utilisateurid = NEW.utilisateurid;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_update_portefeuille_fiat
+AFTER INSERT OR UPDATE ON fond
+FOR EACH ROW
+WHEN (NEW.isvalid = TRUE)
+EXECUTE PROCEDURE update_portefeuille_fiat();
+
+CREATE OR REPLACE FUNCTION update_portefeuille_crypto()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE portemonnaiecrypto
+    SET quantite = quantite + NEW.quantitecrypto
+    WHERE utilisateurid = NEW.acheteurid AND cryptomonnaieid = NEW.cryptomonnaieid;
+
+    UPDATE portemonnaiecrypto
+    SET quantite = quantite - NEW.quantitecrypto
+    WHERE utilisateurid = NEW.vendeurid AND cryptomonnaieid = NEW.cryptomonnaieid;
+
+    UPDATE annoncevente
+    SET isvendue = TRUE
+    WHERE id = NEW.annonceventeid;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_update_portefeuille_crypto
+AFTER INSERT ON transaction
+FOR EACH ROW
+EXECUTE PROCEDURE update_portefeuille_crypto();

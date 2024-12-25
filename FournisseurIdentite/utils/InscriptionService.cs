@@ -1,8 +1,9 @@
 using FournisseurIdentite.Database;
 using FournisseurIdentite.Models;
 using Microsoft.EntityFrameworkCore;
+using FournisseurIdentite.Utils;
 
-namespace FournisseurIdentite.Utils
+namespace FournisseurIdentite.Services
 {
     public class InscriptionService
     {
@@ -28,78 +29,34 @@ namespace FournisseurIdentite.Utils
             {
                 Nom = nom,
                 Email = email,
-                MotDePasse = HashUtility.GenerateSecureHash(motDePasse), 
+                MotDePasse = HashUtility.GenerateSecureHash(motDePasse), // Hachage du mot de passe
                 CodeCreation = codeCreation
             };
+            var serviceEmail = new ServiceEmail();
+            await serviceEmail.EnvoyerAsync(utilisateur.Email, "Validation de votre compte", 
+                $"Bonjour {utilisateur.Nom},\n\nMerci de vous être inscrit. Veuillez cliquer sur le lien suivant pour valider votre compte : http://localhost:5000/validation?email={email}&&code={utilisateur.CodeCreation}");
 
             _context.Utilisateurs.Add(utilisateur);
             await _context.SaveChangesAsync();
-
-            // Associer le statut "inactif"
-            var statutInactif = await _context.Statuts.FirstOrDefaultAsync(s => s.Nom == "inactif");
-            if (statutInactif == null)
-            {
-                throw new Exception("Statut 'inactif' introuvable.");
-            }
-
-            var utilisateurStatut = new UtilisateurStatut
-            {
-                UtilisateurId = utilisateur.Id,
-                StatutId = statutInactif.Id
-            };
-
-            _context.UtilisateurStatuts.Add(utilisateurStatut);
-            await _context.SaveChangesAsync();
-
             // Envoi de l'email de validation
-            var serviceEmail = new ServiceEmail();
-            await serviceEmail.EnvoyerAsync(utilisateur.Email, "Validation de votre compte", 
-                $"Bonjour {utilisateur.Nom},\n\nMerci de vous être inscrit. Veuillez cliquer sur le lien suivant pour valider votre compte : http://localhost:5000/validation?code={codeCreation}");
-
+            
             return true;
         }
 
-        public async Task<bool> ValiderUtilisateur(string codeCreation)
+        public async Task<bool> ValiderUtilisateur(string email,string codeCreation)
         {
             // Rechercher l'utilisateur avec le code de création
             var utilisateur = await _context.Utilisateurs
-                .FirstOrDefaultAsync(u => u.CodeCreation == codeCreation);
+                .FirstOrDefaultAsync(u => u.CodeCreation == codeCreation && u.Email == email);
 
             if (utilisateur == null)
             {
                 throw new Exception("Code de validation invalide ou expiré.");
             }
 
-            // Rechercher le statut "actif"
-            var statutActif = await _context.Statuts
-                .FirstOrDefaultAsync(s => s.Nom == "actif");
-
-            if (statutActif == null)
-            {
-                throw new Exception("Statut 'actif' introuvable.");
-            }
-
             // Mettre à jour le statut de l'utilisateur en "actif"
-            var utilisateurStatut = await _context.UtilisateurStatuts
-                .FirstOrDefaultAsync(us => us.UtilisateurId == utilisateur.Id);
-
             DateTime utcNow = DateTime.UtcNow;  // Obtenez l'heure actuelle en UTC
-
-            if (utilisateurStatut != null)
-            {
-                utilisateurStatut.StatutId = statutActif.Id;
-                utilisateurStatut.DateCreation = utcNow; // Mise à jour de la date en UTC
-                utilisateur.DateCreation = utcNow;
-            }
-            else
-            {
-                _context.UtilisateurStatuts.Add(new UtilisateurStatut
-                {
-                    UtilisateurId = utilisateur.Id,
-                    StatutId = statutActif.Id,
-                    DateCreation = utcNow // Date en UTC
-                });
-            }
+            utilisateur.DateCreation = utcNow;
 
             await _context.SaveChangesAsync();
             return true;

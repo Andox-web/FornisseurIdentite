@@ -8,3 +8,4 @@ obj/
 # Ignorer les fichiers de configuration Git
 .git/
 .gitignore
+.vs/

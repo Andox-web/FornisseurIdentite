@@ -4,7 +4,6 @@ using FournisseurIdentite.Services;
 namespace FournisseurIdentite.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
     public class DemandeReinitialisationController : ControllerBase
     {
         private readonly DemandeReinitialisationService _demandeReinitialisationService;
@@ -14,7 +13,7 @@ namespace FournisseurIdentite.Controllers
             _demandeReinitialisationService = demandeReinitialisationService;
         }
 
-        [HttpPost("reset")]
+        [HttpPost("demandeReinitialisation")]
         public async Task<IActionResult> DemandeReset([FromBody] string email)
         {
             if (string.IsNullOrWhiteSpace(email))

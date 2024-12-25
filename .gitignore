@@ -3,6 +3,9 @@ FournisseurIdentite/obj/
 
 # Ignorer les fichiers de configuration de Visual Studio
 .vscode/
+crypto/affichage/.vscode/
+crypto/serveur/.vscode/
+crypto/serveur/.idea/
 
 # Ignorer les fichiers de configuration Git
 .git/

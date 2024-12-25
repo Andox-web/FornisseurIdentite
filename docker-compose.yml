@@ -1,5 +1,4 @@
 services:
-  # Service pour l'API .NET
   webapi:
     build:
       context: FournisseurIdentite/  # Contexte de construction dans le dossier contenant le Dockerfile et le code source
@@ -10,17 +9,17 @@ services:
       - HashingOptions__SaltSize=32
       - HashingOptions__HashSize=64
       - HashingOptions__Iterations=150000
-      - SESSIONS_DURATION=90
+      - SESSIONS_DURATION=3600
       - PIN_DURATION=90
       - NB_TENTATIVE_MAX=3
+      - CODE_DURATION=120
     ports:
-      - "5000:8080" 
+      - "5000:8080"
     depends_on:
-      - db  
+      - db
     networks:
       - backend
 
-  # Service pour la base de données PostgreSQL
   db:
     image: postgres:16
     environment:
@@ -28,13 +27,46 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     volumes:
-      - ./db/base.sql:/docker-entrypoint-initdb.d/base.sql  
+      - ./db/base.sql:/docker-entrypoint-initdb.d/base.sql
     ports:
       - "5432:5432"
     networks:
       - backend
 
-# Définition du réseau interne pour les services
+  cryptoserveur:
+    build:
+      context: crypto/serveur  # Dossier du serveur Spring Boot
+      dockerfile: Dockerfile         # Fichier Dockerfile dans ce dossier
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/fournisseur
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - FOURNISSEUR_IDENTITE_URL=webapi:8080
+    ports:
+      - "8081:8080"
+    depends_on:
+      - db
+      - webapi
+    networks:
+      - backend
+
+  cryptoaffichage:
+    build:
+      context: crypto/affichage  # Dossier contenant le code Vue.js
+      dockerfile: Dockerfile    # Fichier Dockerfile dans ce dossier
+    environment:
+      - SERVEUR_BASE_URL=cryptoserveur:8080  # Base URL pointant vers le serveur Spring Boot
+      - FOURNISSEUR_IDENTITE_URL=webapi:8080
+      - SESSION_CHECK_VALIDATION=600
+    ports:
+      - "8082:80"  # Port d'exposition du frontend Vue.js
+    depends_on:
+      - cryptoserveur
+      - webapi
+    networks:
+      - backend
+
 networks:
   backend:
     driver: bridge

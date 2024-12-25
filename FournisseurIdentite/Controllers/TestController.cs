@@ -49,7 +49,7 @@ namespace FournisseurIdentite.Controllers
 
                 // Action pour tester la validation de l'utilisateur
        [HttpGet("validation")]
-        public async Task<IActionResult> TestValidation([FromQuery] string code)
+        public async Task<IActionResult> TestValidation(string email, string code)
         {
             try
             {
@@ -58,11 +58,11 @@ namespace FournisseurIdentite.Controllers
                     return BadRequest("Le code de validation est nécessaire.");
                 }
 
-                bool result = await _inscriptionService.ValiderUtilisateur(code);
+                bool result = await _inscriptionService.ValiderUtilisateur(email,code);
 
                 if (result)
                 {
-                    return Ok("Validation réussie. Votre compte est maintenant actif.");
+                    return Ok("Validation réussie. Votre compte est maintenant utilisable.");
                 }
 
                 return BadRequest("Code de validation invalide.");
@@ -73,62 +73,41 @@ namespace FournisseurIdentite.Controllers
                 return StatusCode(500, new { Message = "Erreur de validation", Error = ex.Message, InnerException = innerException });
             }
         }
-
-        // Action pour tester la connexion à la base de données et insérer des valeurs
-        [HttpGet("test-entity")]
-        public IActionResult TestConnection()
+       
+        [HttpGet("test-connection")]
+        public IActionResult TestToken(string token)
         {
-            try
+            if (!_sessionService.ValidateToken(token, out var session))
             {
-                var utilisateurs = _dbContext.Utilisateurs.ToList();
-                var roles = _dbContext.Roles.ToList();
-                var utilisateurRoles = _dbContext.UtilisateurRoles.ToList();
-                var statuts = _dbContext.Statuts.ToList();
-                var utilisateurStatuts = _dbContext.UtilisateurStatuts.ToList();
-                var tentativesConnexion = _dbContext.TentativesConnexion.ToList();
-                var typesSessions = _dbContext.TypesSessions.ToList();
-                var sessions = _dbContext.Sessions.ToList();
-                var authentifications = _dbContext.Authentifications.ToList();
-                var reinitialisations = _dbContext.Reinitialisations.ToList();
-
-                return Ok(new
-                {
-                    Utilisateurs = utilisateurs,
-                    Roles = roles,
-                    UtilisateurRoles = utilisateurRoles,
-                    Statuts = statuts,
-                    UtilisateurStatuts = utilisateurStatuts,
-                    TentativesConnexion = tentativesConnexion,
-                    TypesSessions = typesSessions,
-                    Sessions = sessions,
-                    Authentifications = authentifications,
-                    Reinitialisations = reinitialisations
-                });
-                
+                return new UnauthorizedObjectResult(new {message = "session invalide",IsValid = false} );
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { Message = "Erreur de connexion ou d'insertion", Error = ex.Message });
-            }
-        }
-        [HttpGet("test-token")]
-        [RequiresSession]
-        public IActionResult TestToken()
-        {
-            // Récupérer la session depuis le HttpContext
-            var session = HttpContext.Items["UserSession"] as Session;
-
-            if (session == null)
-                return Unauthorized();
-
             return Ok(new
             {
                 Message = "Token valide",
+                IsValid = true,
                 SessionId = session.Id,
                 UtilisateurId = session.UtilisateurId,
                 ExpireAt = session.ExpireAt
             });
         }
+        [HttpGet("refresh-connection")]
+        public IActionResult refreshToken(string token)
+        {
+            if (!_sessionService.ValidateToken(token, out var session))
+            {
+                return new UnauthorizedObjectResult(new {message = "session invalide,veuillez vous reconnecter.",IsValid = false} );
+            }
+            var newSession =  _sessionService.GenerateSession(session.UtilisateurId);
+            return Ok(new
+            {
+                Message = "Token valide",
+                IsValid = true,
+                SessionId = newSession.Id,
+                UtilisateurId = newSession.UtilisateurId,
+                ExpireAt = newSession.ExpireAt
+            });
+        }
+
         [HttpPost("test-generate-token")]
         public IActionResult GenerateToken(int UtilisateurId)
         {

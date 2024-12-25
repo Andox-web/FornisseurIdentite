@@ -5,11 +5,8 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 
 # Copier les fichiers .csproj et restaurer les dépendances
-COPY *.csproj .
-RUN dotnet restore
-
-# Copier tout le reste des fichiers du projet
 COPY . .
+RUN dotnet restore
 
 # Construire le projet
 RUN dotnet publish -c Release -o out

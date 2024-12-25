@@ -25,24 +25,22 @@ namespace FournisseurIdentite.Controllers
         {
             try
             {
-                var reinitialisations = _dbContext.Reinitialisations
+                var reinitialisation = _dbContext.Reinitialisations
                     .Where(r => r.Email == email)
                     .OrderByDescending(r => r.DateCreation)
-                    .AsEnumerable();
-                var reinitialisation = reinitialisations
-                                            .Where(r => HashUtility.VerifyHash(codeReinitialisation, r.CodeReinitialisation))
-                                            .FirstOrDefault();
+                    .Where(r => r.CodeReinitialisation==codeReinitialisation)
+                    .FirstOrDefault();
 
                 if (reinitialisation == null)
                 {
                     return BadRequest(new { message = "Code de réinitialisation invalide ou email non reconnu." });
                 }
 
-                // Vérification de l'expiration
-                if (reinitialisation.ExpireAt < DateTime.UtcNow)
-                {
-                    return BadRequest(new { message = "Le code de réinitialisation a expiré." });
-                }
+                // // Vérification de l'expiration
+                // if (reinitialisation.ExpireAt < DateTime.UtcNow)
+                // {
+                //     return BadRequest(new { message = "Le code de réinitialisation a expiré." });
+                // }
 
                 // Vérification si déjà utilisé
                 if (reinitialisation.Used)

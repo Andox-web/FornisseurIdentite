@@ -35,7 +35,7 @@ namespace FournisseurIdentite.Services
                     .OrderByDescending(us => us.DateCreation)
                     .FirstOrDefault();
                     
-                    if (utilisateurStatut.StatutId != statutBloque.Id || utilisateurStatut == null )
+                    if (utilisateurStatut == null || utilisateurStatut.StatutId != statutBloque.Id  )
                     {
                         utilisateurStatut = new UtilisateurStatut
                         {
@@ -68,7 +68,7 @@ namespace FournisseurIdentite.Services
         public bool reinitialisation(string email){
             var tentative = _dbContext.TentativesConnexion
                     .FirstOrDefault(t => t.Email == email);
-            if (tentative != null || tentative.CompteurTentative == 0){
+            if (tentative == null || tentative.CompteurTentative == 0){
                return false;
             }
             tentative.CompteurTentative=0;

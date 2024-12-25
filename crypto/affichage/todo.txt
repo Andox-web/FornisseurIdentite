@@ -1,0 +1,34 @@
+ZO (if !vita && travail>vitapPossible)help++
+
+#### cree un variable global ou session ou fonction , ... interagissant stockant token
+#### a part pour les pages authentification mettre un check token (voir fournisseur d'identite ,test-connexion)
+        -si invalide retour page connexion
+
+#### appel refresh token (voir fournisseur d'identite) a tous les changement de page 
+
+####  Authentification 
+    - Page d'inscription.
+    - Page de connexion avec authentification sécurisée (pin).
+
+####  Gestion des portefeuilles
+    - Portefeuille :
+        - Liste des cryptomonnaies et fiat (USD,Euro,..) détenues avec leurs quantités.
+    - fonds
+        -page de demande de retraits et depots
+
+####  Cours et Annonces
+    - Page des cours des cryptomonnaies :
+        - graphe des cryptos avec leurs prix actuels.
+        - Mise à jour toutes les 10 secondes.
+    - Page des annonces de vente :
+        - Liste des annonces disponibles (cryptomonnaie, prix, vendeur,..)
+        - Bouton pour acheter.
+
+####  Transactions
+    - Page d’historique des transactions :
+        - Liste des achats/ventes(transaction) 
+
+####  Annonces de vente
+    - Page pour créer une annonce de vente :
+        - Sélection de la cryptomonnaie.
+        - Quantité à vendre et prix par unité.

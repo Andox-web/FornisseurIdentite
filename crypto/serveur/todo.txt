@@ -1,0 +1,119 @@
+$ : fonction appel la fonction de refresh token dans fourniseuer d'identite et retourne  un token
+
+
+###  Gestion des Portefeuilles
+    #### Consultation du portefeuille (manoa)
+        - URL : `http://localhost:5000/portefeuille`
+        - Header : `Authorization: Bearer token`
+        - Méthode : GET
+        - Response :
+            - Valider : Quantité actuelle du portefeuille fiat(usd) + cryptomonnaies.
+            - Refuser : Message d'erreur.
+                - Erreurs possibles :
+                    - Token invalide.
+                    - Utilisateur non trouvé.
+
+
+    #### Dépôt/retrait dans le portefeuille fiat 
+        ##### initiation de la demande de fond $ (manoa)
+            - URL : `http://localhost:5000/portefeuille/fond/demande` 
+            - Header : `Authorization: Bearer token`
+            - Méthode : POST
+            - Données :
+                - `montant` , tyde fond
+            - Response :
+                - Valider : Message de confirmation ("demande Dépôt effectué avec succès. veillez le comfirmer en clique sur le lien donne en email"),lien dans email contient lien validation + email+code validation.
+                - Refuser : Message d'erreur.
+                    - Erreurs possibles :
+                        - Solde insuffisant.
+                        - Montant invalide.
+                        - Token invalide.
+        
+        ##### Validation  (manoa)
+             - URL : `http://localhost:5000/portefeuille/fond/validation`
+            - Header : `Authorization: Bearer token`
+            - Méthode : POST
+            - Données :
+                - email , code 
+            - Response :
+                - Valider : Message de confirmation ("demande Dépôt effectué avec succès. veillez le comfirmer en clique sur le lien donne en email"),lien dans email contient lien validation + email+code validation.
+                - Refuser : Message d'erreur.
+                    - Erreurs possibles :
+                        - code invalide ou expire
+                        - Solde insuffisant.
+                        - Montant invalide.
+                        - Token invalide.
+
+###  Gestion des Cours et Annonces 
+    #### liste annonce vente (manoa)
+        #### Consultation de l'historique (ando)
+        - URL : `http://localhost:5000/transactions`
+        - Méthode : GET
+        - Response :
+            - Valider : Liste des annonce vente non vendue.
+            - Refuser : Message d'erreur.
+                - Erreurs possibles :
+                    -erreur interne
+                    
+    #### Consultation des cours des cryptomonnaies (mikajy)
+    - URL : `http://localhost:5000/cryptos/cours`
+    - Méthode : GET
+    - Response :
+        - Valider : Tableau des cryptomonnaies avec leurs cours actuels.
+        - Refuser : Message d'erreur.
+            - Erreurs possibles :
+                - Problème interne du serveur.
+
+
+    #### Création d’une annonce de vente $ (mikajy)
+    - URL : `http://localhost:5000/annonce/vente`
+    - Header : `Authorization: Bearer token`
+    - Méthode : POST
+    - Données :
+        - annonce vente
+    - Response :
+        - Valider : Message de confirmation ("Annonce créée avec succès.").
+        - Refuser : Message d'erreur.
+            - Erreurs possibles :
+                - Quantité insuffisante.
+                - Cryptomonnaie non reconnue.
+                - Token invalide.
+
+
+###  Gestion des Transactions
+    #### Achat de cryptomonnaies $ (mikajy)
+    - URL : `http://localhost:5000/transaction/achat`
+    - Header : `Authorization: Bearer token`
+    - Méthode : POST
+    - Données :
+        - `annonce_id`
+        - `quantite`
+    - Response :
+        - Valider : Message de confirmation ("Achat effectué avec succès.").
+        - Refuser : Message d'erreur.
+            - Erreurs possibles :
+                - Annonce introuvable ou déjà vendue.
+                - Solde insuffisant.
+                - Quantité demandée non disponible.
+
+
+###  Historique des Transactions
+    #### Consultation de l'historique (ando)
+        - URL : `http://localhost:5000/transactions`
+        - Header : `Authorization: Bearer token`
+        - Méthode : GET
+        - Response :
+            - Valider : Liste des transactions (achats/ventes(transaction)).
+            - Refuser : Message d'erreur.
+            - Erreurs possibles :
+                - Token invalide.
+                - Utilisateur non trouvé.
+
+    #### Consultation de l'historique tous les Utilisateur (ando)
+        - URL : `http://localhost:5000/transactions`
+        - Méthode : GET
+        - Response :
+            - Valider : Liste des transactions (achats/ventes(transaction)).
+            - Refuser : Message d'erreur.
+                - Erreurs possibles :
+                    - erreur interne
