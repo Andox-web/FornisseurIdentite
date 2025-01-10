@@ -51,7 +51,6 @@
     align-items: center;
     padding: 2rem;
     background: #1c1c1c;
-    border-radius: 8px;
     width: 100%;
     height: 100%;
     color: white;

@@ -175,7 +175,6 @@ export default {
 
 .main-content {
   flex-grow: 1;
-  padding: 20px;
   overflow-y: auto;
   height: 100vh;
   background-color: #f4f4f4;

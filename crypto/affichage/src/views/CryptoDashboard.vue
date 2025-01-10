@@ -58,7 +58,6 @@ export default {
   gap: 20px;
   padding: 2rem;
   background: #222;
-  border-radius: 8px;
   width: 100%;
   height: 100vh;
   overflow: hidden;
