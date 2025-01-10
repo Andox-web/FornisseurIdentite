@@ -1,4 +1,5 @@
-ZO (if !vita && travail>vitapPossible)help++
+fonctionnalite, type de tache, tache, description, responsable, temps, status, remarque
+dev :ZO 
 
 #### cree un variable global ou session ou fonction , ... interagissant stockant token
 #### a part pour les pages authentification mettre un check token (voir fournisseur d'identite ,test-connexion)
