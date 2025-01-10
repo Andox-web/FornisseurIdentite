@@ -52,7 +52,6 @@ body {
   padding: 20px;
   background-color: #1e1e1e;
   color: #e4e4e4;
-  border-radius: 8px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
   width: 100%;
   height: 100%;
