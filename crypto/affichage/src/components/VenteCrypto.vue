@@ -92,7 +92,6 @@
     align-items: center;
     padding: 2rem;
     background: #1c1c1c;
-    border-radius: 12px;
     width: 100%;
     height: 100%;
     min-height: 100vh;
