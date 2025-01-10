@@ -26,11 +26,6 @@
       </button>
     </form>
 
-    <form @submit.prevent="redirection">
-      <button type="submit">
-        {{ "Tester redirection" }}
-      </button></form>
-
     <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
   </div>
 </template>
