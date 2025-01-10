@@ -60,7 +60,7 @@ export default {
   background: #222;
   width: 100%;
   height: 100vh;
-  overflow: hidden;
+  overflow-y: auto; /* Permet le défilement vertical */
 }
 
 .button-container {
@@ -104,6 +104,7 @@ export default {
   padding: 2rem;
   border-radius: 8px;
   transition: opacity 0.5s ease-in-out, transform 0.3s ease;
+  min-height: 100%; /* Assure que le contenu prend toute la hauteur disponible */
 }
 
 .panel-enter-active, .panel-leave-active {
