@@ -28,8 +28,10 @@ namespace FournisseurIdentite.Controllers
         }
 
         [HttpPost("Authentification")]
-        public IActionResult Authenticate(String email, int pin)
+        public IActionResult Authenticate([FromBody] PinRequest pinreq)
         {
+            var email = pinreq.Email;
+            var pin = pinreq.Pin;
             // Étape 1 : Récupérer les authentifications valides depuis la base de données
             var authentifications = _dbContext.Authentifications
                 .Where(a => a.Email == email && !a.Used)
