@@ -28,8 +28,10 @@ namespace FournisseurIdentite.Controllers
         }
 
         [HttpPost("Authentification")]
-        public IActionResult Authenticate(String email, int pin)
+        public IActionResult Authenticate([FromBody] PinRequest request)
         {
+            var email = request.Email;
+            var pin = request.Pin;
             // Étape 1 : Récupérer les authentifications valides depuis la base de données
             var authentifications = _dbContext.Authentifications
                 .Where(a => a.Email == email && !a.Used)
@@ -144,4 +146,15 @@ namespace FournisseurIdentite.Controllers
         [Required(ErrorMessage = "Le mot de passe est requis.")]
         public string? MotDePasse { get; set; }
     }
+
+    public class PinRequest
+    {
+        [Required(ErrorMessage = "L'email est requis.")]
+        [EmailAddress(ErrorMessage = "L'email n'est pas valide.")]
+        public string? Email { get; set; }
+
+        [Required(ErrorMessage = "Le mot de passe est requis.")]
+        public string? Pin { get; set; }
+    }
+
 }

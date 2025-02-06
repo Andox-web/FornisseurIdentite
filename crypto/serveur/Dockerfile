@@ -1,5 +1,5 @@
 # Utilise l'image officielle de Java pour la construction de l'application
-FROM openjdk:17-jdk-slim AS build
+FROM openjdk:20-jdk-slim AS build
 
 # Installez Maven
 RUN apt-get update && apt-get install -y maven
@@ -15,7 +15,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Utilisation d'une image plus légère pour l'exécution de l'application
-FROM openjdk:17-jdk-slim
+FROM openjdk:20-jdk-slim
 
 # Répertoire de travail pour l'exécution
 WORKDIR /app

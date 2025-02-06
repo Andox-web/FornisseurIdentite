@@ -1,7 +1,5 @@
 <template>
-  <div id="app" class="app-container">
-    <!-- Affichage du composant UserAuth si l'utilisateur n'est pas connecté -->
-    <div v-if="!isLoggedIn" class="auth-container">
+   <div v-if="!isLoggedIn" class="auth-container">
       <div class="left-panel">
         <img alt="Vue logo" class="logo" src="./assets/logo.png">
       </div>
@@ -11,66 +9,72 @@
     </div>
 
     <!-- Affichage du menu et du contenu principal si l'utilisateur est connecté -->
-    <div v-else class="authenticated-container">
-      <div class="sidebar">
-        <ul>
-          <li :class="{ active: currentComponent === 'Dashboard' }" @click="selectComponent('Dashboard')">Dashboard</li>
-          <li :class="{ active: currentComponent === 'Transactions' }" @click="selectComponent('Transactions')">Transactions</li>
-          <li :class="{ active: currentComponent === 'Portefeuille' }" @click="selectComponent('Portefeuille')">Portefeuille</li>
-          <li :class="{ active: currentComponent === 'Market' }" @click="selectComponent('Market')">Market</li>
-        </ul>
-        <div class="user-info">
-          <p><strong>Nom de l'utilisateur :</strong> John Doe</p>
-          <p><strong>Email :</strong> john.doe@example.com</p>
-        </div>
-      </div>
-
-      <div class="main-content">
-        <component :is="currentComponent" :key="currentComponent"></component>
+    <div v-else-if="userRole" class="authenticated-container" style="flex-direction: column;">
+      <div :class="{'nav-open': $sidebar.showSidebar}">
+        <notifications></notifications>
+        <router-view></router-view>
       </div>
     </div>
-  </div>
+  
 </template>
 
 <script>
-import Dashboard from './views/CryptoDashboard.vue'
-import Transactions from './components/HistoricTransaction.vue'
-import Portefeuille from './views/HomeView.vue'
-import Market from './components/VenteCrypto.vue'
-import UserAuth from './components/UserAuth.vue'
-
-export default {
-  name: 'App',
-  data() {
+import UserAuth from 'src/pages/UserAuth.vue';
+  export default {
+    data() {
     return {
       isLoggedIn: false,
-      currentComponent: 'Dashboard'
-    }
-  },
-  components: {
-    Dashboard,
-    Transactions,
-    Portefeuille,
-    Market,
-    UserAuth
-  },
-  methods: {
-    selectComponent(component) {
-      this.currentComponent = component;
+      userRole: 'non'
+      }
     },
-    goToAccueil() {
-      console.log("L'événement a été capté, je vais rediriger !");
+    components: {
+      UserAuth},
+    methods: {
+    goToAccueil(role) {
+      console.log("L'événement 2233 a été capté, je vais rediriger !");
       this.isLoggedIn = true;  // L'utilisateur est maintenant connecté
+      this.userRole = 'non';
+      if(this.userRole === 'admin'){
+        this.$router.push('/admin/demande');
+      } else {
+        this.$router.push('/user/overview');
+      }
+
+    }
     }
   }
-}
 </script>
+<style lang="scss">
+  .vue-notifyjs.notifications{
+    .list-move {
+      transition: transform 0.3s, opacity 0.4s;
+    }
+    .list-item {
+      display: inline-block;
+      margin-right: 10px;
 
-<style scoped>
-/* Styles pour l'authentification */
-.auth-container {
+    }
+    .list-enter-active {
+      transition: transform 0.2s ease-in, opacity 0.4s ease-in;
+    }
+    .list-leave-active {
+      transition: transform 1s ease-out, opacity 0.4s ease-out;
+    }
+
+    .list-enter {
+      opacity: 0;
+      transform: scale(1.1);
+
+    }
+    .list-leave-to {
+      opacity: 0;
+      transform: scale(1.2, 0.7);
+    }
+  }
+
+  .auth-container {
   display: flex;
-  height: 100%;
+  height: 584px;
   width: inherit;
 }
 
@@ -94,12 +98,31 @@ export default {
 
 .logo {
   width: 500px;
-  transition: transform 0.3s ease-in-out;
+  animation: zoomInRotate 1s ease-out; /* Animation au chargement */
+  transition: transform 0.4s ease-in-out, box-shadow 0.4s ease-in-out;
+
+  &:hover {
+    transform: scale(1.2) rotate(3deg); /* Effet au survol */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  &:active {
+    transform: scale(0.95) rotate(-2deg); /* Effet au clic */
+  }
 }
 
-.logo:hover {
-  transform: scale(1.1);
+/* Animation de chargement */
+@keyframes zoomInRotate {
+  from {
+    opacity: 0;
+    transform: scale(0.5) rotate(-10deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
 }
+
 
 @keyframes fadeInLeft {
   from {

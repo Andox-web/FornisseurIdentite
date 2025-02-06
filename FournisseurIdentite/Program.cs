@@ -17,6 +17,17 @@ builder.Services.AddControllers(options =>
 {
     options.Filters.Add<SessionFilter>();
 });
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowLocalhost", builder =>
+    {
+        builder.WithOrigins("http://localhost:8082")  // Allow frontend origin
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseLowerCaseNamingConvention()
             .UseNpgsql(Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")));
@@ -33,6 +44,12 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowLocalhost"); 
+
+// app.UseCors(
+//         options => options.WithOrigins("http://localhost:8082").AllowAnyMethod()
+// );
 
 app.UseAuthorization();
 

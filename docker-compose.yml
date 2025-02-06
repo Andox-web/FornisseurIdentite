@@ -51,21 +51,21 @@ services:
     networks:
       - backend
 
-  cryptoaffichage:
-    build:
-      context: crypto/affichage  # Dossier contenant le code Vue.js
-      dockerfile: Dockerfile    # Fichier Dockerfile dans ce dossier
-    environment:
-      - SERVEUR_BASE_URL=cryptoserveur:8080  # Base URL pointant vers le serveur Spring Boot
-      - FOURNISSEUR_IDENTITE_URL=webapi:8080
-      - SESSION_CHECK_VALIDATION=600
-    ports:
-      - "8082:80"  # Port d'exposition du frontend Vue.js
-    depends_on:
-      - cryptoserveur
-      - webapi
-    networks:
-      - backend
+  # cryptoaffichage:
+  #   build:
+  #     context: crypto/affichage  # Dossier contenant le code Vue.js
+  #     dockerfile: Dockerfile    # Fichier Dockerfile dans ce dossier
+  #   environment:
+  #     - SERVEUR_BASE_URL=cryptoserveur:8080  # Base URL pointant vers le serveur Spring Boot
+  #     - FOURNISSEUR_IDENTITE_URL=webapi:8080
+  #     - SESSION_CHECK_VALIDATION=600
+  #   ports:
+  #     - "8082:80"  # Port d'exposition du frontend Vue.js
+  #   depends_on:
+  #     - cryptoserveur
+  #     - webapi
+  #   networks:
+  #     - backend
 
 networks:
   backend:

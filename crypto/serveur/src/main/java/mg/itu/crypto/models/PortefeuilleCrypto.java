@@ -1,8 +1,7 @@
 package mg.itu.crypto.models;
+
 import jakarta.persistence.*;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
 
 @Entity
 @Table(name = "portemonnaiecrypto")
@@ -22,5 +21,36 @@ public class PortefeuilleCrypto {
     @Column(precision = 20, scale = 8)
     private BigDecimal quantite = BigDecimal.ZERO;
 
-    // Getters and setters
+    // Getters and Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Utilisateur getUtilisateur() {
+        return utilisateur;
+    }
+
+    public void setUtilisateur(Utilisateur utilisateur) {
+        this.utilisateur = utilisateur;
+    }
+
+    public Cryptomonnaie getCryptomonnaie() {
+        return cryptomonnaie;
+    }
+
+    public void setCryptomonnaie(Cryptomonnaie cryptomonnaie) {
+        this.cryptomonnaie = cryptomonnaie;
+    }
+
+    public BigDecimal getQuantite() {
+        return quantite;
+    }
+
+    public void setQuantite(BigDecimal quantite) {
+        this.quantite = quantite;
+    }
 }
