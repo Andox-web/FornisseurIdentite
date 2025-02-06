@@ -1,0 +1,38 @@
+INSERT INTO cryptomonnaie (nom, abrev) VALUES 
+    ('Bitcoin', 'BTC'),
+    ('Ethereum', 'ETH');
+
+
+INSERT INTO portemonnaiecrypto (utilisateurid, cryptomonnaieid, quantite) VALUES 
+    (1, 1, 0),
+    (1, 2, 0);
+
+-- Annonce de vente de Bitcoin
+INSERT INTO annoncevente (vendeurid, cryptomonnaieid, quantite, prix) 
+VALUES 
+    (1, 1, 0.5, 30000);  -- 0.5 BTC à 30000
+
+-- Annonce de vente d'Ethereum
+INSERT INTO annoncevente (vendeurid, cryptomonnaieid, quantite, prix) 
+VALUES 
+    (1, 2, 10, 2000);  -- 10 ETH à 2000
+
+INSERT INTO portemonnaiefiat (utilisateurid, quantite) 
+VALUES 
+    (1, 1000.00); 
+
+
+-- Transaction 1 : Achat d'une portion de Bitcoin
+INSERT INTO transaction (annonceventeid, vendeurid, acheteurid, quantitecrypto, cryptomonnaieid)
+VALUES 
+(1, 1, 1, 0.1, 1);
+
+-- Transaction 2 : Achat d'Ethereum
+INSERT INTO transaction (annonceventeid, vendeurid, acheteurid, quantitecrypto, cryptomonnaieid)
+VALUES 
+(2, 1, 1, 2, 2);
+
+-- Transaction 3 : Achat de Bitcoin
+INSERT INTO transaction (annonceventeid, vendeurid, acheteurid, quantitecrypto, cryptomonnaieid)
+VALUES 
+(1, 1, 1, 0.2, 1);

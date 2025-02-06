@@ -28,6 +28,7 @@ namespace FournisseurIdentite.Controllers
         }
 
         [HttpPost("Authentification")]
+
         public IActionResult Authenticate([FromBody] PinRequest pinreq)
         {
             var email = pinreq.Email;
@@ -146,4 +147,15 @@ namespace FournisseurIdentite.Controllers
         [Required(ErrorMessage = "Le mot de passe est requis.")]
         public string? MotDePasse { get; set; }
     }
+
+    public class PinRequest
+    {
+        [Required(ErrorMessage = "L'email est requis.")]
+        [EmailAddress(ErrorMessage = "L'email n'est pas valide.")]
+        public string? Email { get; set; }
+
+        [Required(ErrorMessage = "Le mot de passe est requis.")]
+        public string? Pin { get; set; }
+    }
+
 }

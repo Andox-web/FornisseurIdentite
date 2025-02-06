@@ -21,5 +21,36 @@ public class ChangeCrypto {
     @Column(nullable = false)
     private LocalDateTime datechangement = LocalDateTime.now();
 
-    // Getters and setters
+    // Getters and Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Cryptomonnaie getCryptomonnaie() {
+        return cryptomonnaie;
+    }
+
+    public void setCryptomonnaie(Cryptomonnaie cryptomonnaie) {
+        this.cryptomonnaie = cryptomonnaie;
+    }
+
+    public BigDecimal getValeur() {
+        return valeur;
+    }
+
+    public void setValeur(BigDecimal valeur) {
+        this.valeur = valeur;
+    }
+
+    public LocalDateTime getDatechangement() {
+        return datechangement;
+    }
+
+    public void setDatechangement(LocalDateTime datechangement) {
+        this.datechangement = datechangement;
+    }
 }

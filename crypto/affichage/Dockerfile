@@ -8,7 +8,7 @@ WORKDIR /app
 COPY . .
 
 # Installe les dépendances
-RUN npm install
+# RUN npm install
 
 # Génère le build de l'application Vue.js
 RUN npm run build

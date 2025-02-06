@@ -1,4 +1,5 @@
 package mg.itu.crypto.models;
+
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -39,5 +40,76 @@ public class Transaction {
 
     private LocalDateTime dateTransaction = LocalDateTime.now();
 
-    // Getters and setters
+    // Getters and Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public AnnonceVente getAnnonceVente() {
+        return annonceVente;
+    }
+
+    public void setAnnonceVente(AnnonceVente annonceVente) {
+        this.annonceVente = annonceVente;
+    }
+
+    public Utilisateur getVendeur() {
+        return vendeur;
+    }
+
+    public void setVendeur(Utilisateur vendeur) {
+        this.vendeur = vendeur;
+    }
+
+    public Utilisateur getAcheteur() {
+        return acheteur;
+    }
+
+    public void setAcheteur(Utilisateur acheteur) {
+        this.acheteur = acheteur;
+    }
+
+    public Fond getRetrait() {
+        return retrait;
+    }
+
+    public void setRetrait(Fond retrait) {
+        this.retrait = retrait;
+    }
+
+    public Fond getDepot() {
+        return depot;
+    }
+
+    public void setDepot(Fond depot) {
+        this.depot = depot;
+    }
+
+    public Cryptomonnaie getCryptomonnaie() {
+        return cryptomonnaie;
+    }
+
+    public void setCryptomonnaie(Cryptomonnaie cryptomonnaie) {
+        this.cryptomonnaie = cryptomonnaie;
+    }
+
+    public BigDecimal getQuantitecrypto() {
+        return quantitecrypto;
+    }
+
+    public void setQuantitecrypto(BigDecimal quantitecrypto) {
+        this.quantitecrypto = quantitecrypto;
+    }
+
+    public LocalDateTime getDateTransaction() {
+        return dateTransaction;
+    }
+
+    public void setDateTransaction(LocalDateTime dateTransaction) {
+        this.dateTransaction = dateTransaction;
+    }
 }

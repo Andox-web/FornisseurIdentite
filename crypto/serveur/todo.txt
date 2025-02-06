@@ -1,7 +1,7 @@
 $ : fonction appel la fonction de refresh token dans fourniseuer d'identite et retourne  un token
 
-
 ###  Gestion des Portefeuilles
+    ok
     #### Consultation du portefeuille (manoa)
         - URL : `http://localhost:5000/portefeuille`
         - Header : `Authorization: Bearer token`
@@ -14,6 +14,7 @@ $ : fonction appel la fonction de refresh token dans fourniseuer d'identite et r
                     - Utilisateur non trouvé.
 
 
+    ok
     #### Dépôt/retrait dans le portefeuille fiat 
         ##### initiation de la demande de fond $ (manoa)
             - URL : `http://localhost:5000/portefeuille/fond/demande` 
@@ -29,6 +30,7 @@ $ : fonction appel la fonction de refresh token dans fourniseuer d'identite et r
                         - Montant invalide.
                         - Token invalide.
         
+        teste
         ##### Validation  (manoa)
              - URL : `http://localhost:5000/portefeuille/fond/validation`
             - Header : `Authorization: Bearer token`
@@ -45,6 +47,7 @@ $ : fonction appel la fonction de refresh token dans fourniseuer d'identite et r
                         - Token invalide.
 
 ###  Gestion des Cours et Annonces 
+    ok
     #### liste annonce vente (manoa)
         #### Consultation de l'historique (ando)
         - URL : `http://localhost:5000/transactions`
@@ -54,7 +57,7 @@ $ : fonction appel la fonction de refresh token dans fourniseuer d'identite et r
             - Refuser : Message d'erreur.
                 - Erreurs possibles :
                     -erreur interne
-                    
+    test              
     #### Consultation des cours des cryptomonnaies (mikajy)
     - URL : `http://localhost:5000/cryptos/cours`
     - Méthode : GET
@@ -64,7 +67,7 @@ $ : fonction appel la fonction de refresh token dans fourniseuer d'identite et r
             - Erreurs possibles :
                 - Problème interne du serveur.
 
-
+    ok
     #### Création d’une annonce de vente $ (mikajy)
     - URL : `http://localhost:5000/annonce/vente`
     - Header : `Authorization: Bearer token`
@@ -81,6 +84,7 @@ $ : fonction appel la fonction de refresh token dans fourniseuer d'identite et r
 
 
 ###  Gestion des Transactions
+    ok
     #### Achat de cryptomonnaies $ (mikajy)
     - URL : `http://localhost:5000/transaction/achat`
     - Header : `Authorization: Bearer token`

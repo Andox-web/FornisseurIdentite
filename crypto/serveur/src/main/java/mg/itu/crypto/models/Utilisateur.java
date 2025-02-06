@@ -1,8 +1,6 @@
 package mg.itu.crypto.models;
 
-
 import jakarta.persistence.*;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -25,5 +23,52 @@ public class Utilisateur {
     @Column(unique = true, nullable = false)
     private String codecreation;
 
-    // Getters and setters
+    // Getters and Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getNom() {
+        return nom;
+    }
+
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getMotdepasse() {
+        return motdepasse;
+    }
+
+    public void setMotdepasse(String motdepasse) {
+        this.motdepasse = motdepasse;
+    }
+
+    public LocalDateTime getDatecreation() {
+        return datecreation;
+    }
+
+    public void setDatecreation(LocalDateTime datecreation) {
+        this.datecreation = datecreation;
+    }
+
+    public String getCodecreation() {
+        return codecreation;
+    }
+
+    public void setCodecreation(String codecreation) {
+        this.codecreation = codecreation;
+    }
 }
