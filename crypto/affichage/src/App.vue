@@ -23,7 +23,7 @@ import UserAuth from 'src/pages/UserAuth.vue';
   export default {
     data() {
     return {
-      isLoggedIn: false,
+      isLoggedIn: true,
       userRole: 'non'
       }
     },
