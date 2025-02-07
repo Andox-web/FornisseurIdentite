@@ -78,10 +78,10 @@ export default {
       cryptos: ["Bitcoin", "Ethereum", "BNB", "Solana"],
       lineChart: {
         data: {
-          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+          // labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
           series: {
             Bitcoin: [5, 10, 15, 20, 700, 30, 35],
-            Ethereum: [30, 600, 90, 120, 150, 180, 210],
+            Ethereum: [30, 400, 600, 90, 120, 150, 180, 210],
             BNB: [2, 4, 6, 8, 10, 12, 104],
             Solana: [7, 40, 21, 500, 35, 240, 49]
           }
