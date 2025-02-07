@@ -7,8 +7,8 @@
                 body-classes="table-full-width table-responsive"
           >
             <template slot="header">
-              <h4 class="card-title">Annonces disponibles</h4>
-              <p class="card-category">Liste des cryptos en vente</p>
+              <h4 class="card-title">Achat/vente cryptomonnaie</h4>
+              <p class="card-category">Liste des cryptos </p>
             </template>
             <table class="table table-hover table-striped">
               <thead>

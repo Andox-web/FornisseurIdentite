@@ -118,7 +118,7 @@ data() {
           // localStorage.setItem("auth_token12", data.token);
          this.$emit('goToHome');
 
-        this.$emit('login-success', data.role);
+          this.$emit('login-success', data.role);
           
       } catch (error) {
           this.errorMessage;

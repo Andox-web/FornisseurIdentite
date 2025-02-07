@@ -16,19 +16,15 @@
       </sidebar-link>
       <sidebar-link to="/user/annonce">
         <i class="nc-icon nc-notes"></i>
-        <p>Faire une Transaction</p>
-      </sidebar-link>
-      <sidebar-link to="/user/myhistoric">
-        <i class="nc-icon nc-paper-2"></i>
-        <p>Mes transactions</p>
+        <p>Vente/achat</p>
       </sidebar-link>
       <sidebar-link to="/user/historic">
         <i class="nc-icon nc-paper-2"></i>
         <p>Historiques des transaction</p>
       </sidebar-link>
-      <sidebar-link to="/user/analyse">
+      <sidebar-link to="/user/vente">
         <i class="nc-icon nc-money-coins"></i>
-        <p>Analyse</p>
+        <p>Vendre</p>
       </sidebar-link>
     </side-bar>
     <div class="main-panel">

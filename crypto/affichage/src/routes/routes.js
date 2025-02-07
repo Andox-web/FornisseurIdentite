@@ -8,15 +8,12 @@ import Overview from 'src/pages/frontoffice/CoursCrypto.vue'
 import UserProfile from 'src/pages/frontoffice/UserProfile.vue'
 import Annonce from 'src/pages/frontoffice/Annonce.vue'
 import Portefeuille from 'src/pages/frontoffice/Portefeuille.vue'
+import Vente from 'src/pages/frontoffice/VenteCrypto.vue'
 import Upgrade from 'src/pages/frontoffice/Upgrade.vue'
 import Userauth from 'src/pages/UserAuth.vue'
 import Historic from 'src/pages/frontoffice/Historic.vue'
 import Demande from 'src/pages/backoffice/Demandes.vue'
-import Analyse from 'src/pages/frontoffice/Analyse.vue'
-import Commission from 'src/pages/backoffice/Commission.vue'
-import Commissionanalyse from 'src/pages/backoffice/AnalyseCommission.vue'
-import Wallets from 'src/pages/backoffice/Wallets.vue'
-import MyHistoric from 'src/pages/frontoffice/MyHistoric.vue'
+import Config from 'src/pages/backoffice/Config.vue'
 
 
 const routes = [
@@ -51,19 +48,14 @@ const routes = [
         component: Portefeuille
       },
       {
-        path: 'analyse',
-        name: 'Analyse',
-        component: Analyse
+        path: 'vente',
+        name: 'Vente',
+        component: Vente
       },
       {
         path: 'historic',
         name: 'Historic',
         component: Historic
-      },
-      {
-        path: 'myhistoric',
-        name: 'Myhistoric',
-        component: MyHistoric
       },
       {
         path: 'userauth',
@@ -88,19 +80,9 @@ const routes = [
         component: Demande
       },
       {
-        path: 'commission',
-        name: 'Commission',
-        component: Commission
-      },
-      {
-        path: 'commissionanalyse',
-        name: 'Commissionanalyse',
-        component: Commissionanalyse
-      },
-      {
-        path: 'wallets',
-        name: 'Wallets',
-        component: Wallets
+        path: 'config',
+        name: 'Config',
+        component: Config
       }
     ]
   },
