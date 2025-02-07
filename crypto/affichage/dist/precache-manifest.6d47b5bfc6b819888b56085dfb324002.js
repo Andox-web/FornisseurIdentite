@@ -24,12 +24,12 @@ self.__precacheManifest = [
     "url": "/img/logo.15b30761.png"
   },
   {
-    "revision": "8224e0160e362e117cbe00495919e2af",
-    "url": "/fonts/nucleo-icons.8224e016.eot"
-  },
-  {
     "revision": "ff208b8d733e61a630992ee2b72c9c1c",
     "url": "/fonts/nucleo-icons.ff208b8d.woff2"
+  },
+  {
+    "revision": "8224e0160e362e117cbe00495919e2af",
+    "url": "/fonts/nucleo-icons.8224e016.eot"
   },
   {
     "revision": "b0dc05d015e91e7d28d79cd0056fe555",
@@ -44,12 +44,12 @@ self.__precacheManifest = [
     "url": "/index.html"
   },
   {
-    "revision": "a9615bac158705203261e8348f574cc8",
-    "url": "/img/default-avatar.png"
-  },
-  {
     "revision": "d41d8cd98f00b204e9800998ecf8427e",
     "url": "/.gitkeep"
+  },
+  {
+    "revision": "be74132f42ae1d3502f9a9b9fff68ac1",
+    "url": "/Dashboard.PNG"
   },
   {
     "revision": "996d8248f580f8e26e6c45c67da9b5a6",
@@ -57,19 +57,19 @@ self.__precacheManifest = [
   },
   {
     "revision": "a9615bac158705203261e8348f574cc8",
+    "url": "/img/default-avatar.png"
+  },
+  {
+    "revision": "a9615bac158705203261e8348f574cc8",
     "url": "/img/faces/face-0.jpg"
-  },
-  {
-    "revision": "be74132f42ae1d3502f9a9b9fff68ac1",
-    "url": "/Dashboard.PNG"
-  },
-  {
-    "revision": "0e953b1ea6d6e3addd7210e9c7c420a7",
-    "url": "/img/faces/face-2.jpg"
   },
   {
     "revision": "99e58416b89637502b40ac8350eed85a",
     "url": "/img/faces/face-1.jpg"
+  },
+  {
+    "revision": "0e953b1ea6d6e3addd7210e9c7c420a7",
+    "url": "/img/faces/face-2.jpg"
   },
   {
     "revision": "ce7a6b79aa55041f7ae36f6ce22231fe",
@@ -112,16 +112,16 @@ self.__precacheManifest = [
     "url": "/img/new_logo.png"
   },
   {
+    "revision": "6be21e8a1b7d63048728851c6003e189",
+    "url": "/img/sidebar-1.jpg"
+  },
+  {
     "revision": "7a4ce7cc040fc1cb8176cde106e9232f",
     "url": "/img/sidebar-2.jpg"
   },
   {
     "revision": "cd253e23ed052deeb80b42d2ed772183",
     "url": "/img/sidebar-3.jpg"
-  },
-  {
-    "revision": "6be21e8a1b7d63048728851c6003e189",
-    "url": "/img/sidebar-1.jpg"
   },
   {
     "revision": "897b4cf909210560a84398d36da51983",
