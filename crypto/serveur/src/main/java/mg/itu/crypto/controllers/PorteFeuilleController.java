@@ -1,10 +1,10 @@
 package mg.itu.crypto.controllers;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,16 +13,19 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
+import mg.itu.crypto.models.Fond;
 import mg.itu.crypto.models.PortefeuilleCrypto;
 import mg.itu.crypto.models.PortefeuilleFiat;
 import mg.itu.crypto.models.TypeFond;
 import mg.itu.crypto.models.Utilisateur;
 import mg.itu.crypto.repositories.FondRepository;
-import mg.itu.crypto.repositories.TypeFondRepository;
 import mg.itu.crypto.repositories.PortefeuilleCryptoRepository;
 import mg.itu.crypto.repositories.PortefeuilleFiatRepository;
+import mg.itu.crypto.repositories.TypeFondRepository;
 import mg.itu.crypto.repositories.UtilisateurRepository;
+import mg.itu.crypto.utils.ServiceEmail;
 
 @RestController
 public class PorteFeuilleController {
@@ -41,6 +44,10 @@ public class PorteFeuilleController {
 
     @Autowired
     private TypeFondRepository typeFondRepository;
+
+    // @Autowired
+    // private RestTemplate restTemplate;
+
 
     @GetMapping("/portefeuille")
     public ResponseEntity<?> test(@RequestHeader("Authorization") String header){
@@ -90,9 +97,12 @@ public class PorteFeuilleController {
 
         PortefeuilleFiat portefeuilleFiat = portefeuilleFiatOpt.get()[0]; // On suppose qu'il y a un seul portefeuille par utilisateur
 
-        // Vérification du solde suffisant
-        if (portefeuilleFiat.getQuantite().compareTo(montant) < 0) {
-            return ResponseEntity.status(400).body(Map.of("error", "Solde insuffisant"));
+        if(typeFondId == 2) {
+            // Vérification du solde suffisant
+            if (portefeuilleFiat.getQuantite().compareTo(montant) < 0) {
+                return ResponseEntity.status(400).body(Map.of("error", "Solde insuffisant"));
+            }
+
         }
 
         // Vérification du montant valide
@@ -108,55 +118,58 @@ public class PorteFeuilleController {
 
         TypeFond typeFond = typeFondOpt.get();
 
+        Fond fond = new Fond();
+        fond.setValeur(montant);
+        fond.setTypeFond(typeFond);
+        fond.setUtilisateur(utilisateur);
+        fond.setDatefond(LocalDateTime.now());
+
         // Générer un code de validation et un lien
-        String validationCode = UUID.randomUUID().toString();
-        String validationLink = "http://localhost:8081/portefeuille/fond/validation?email=" + utilisateur.getEmail() + "&code=" + validationCode;
+        // String validationCode = UUID.randomUUID().toString();
+        // String validationLink = "http://localhost:8081/portefeuille/fond/validation?email=" + utilisateur.getEmail() + "&code=" + validationCode;
 
         // Sauvegarder la demande (simulée ici), vous devrez ajouter la logique pour envoyer l'email
         // Exemple de code d'envoi d'email avec lien de validation (non inclus dans cet exemple)
 
-        return ResponseEntity.ok(Map.of("message", "Demande de " + typeFond.getType() + " effectuée avec succès. Veuillez le confirmer en cliquant sur le lien envoyé par email.",
-                                        "lien_validation", validationLink));
+        fondRepository.save(fond);
+        fond = fondRepository.findLastByUtilisateurId(utilisateur.getId());
+        
+        // fond = fondOpt.get();
+        Long idFond = fond.getId();
+    
+        // Appel de l’API .NET pour envoyer l’email
+        String email = utilisateur.getEmail();
+        String url = "http://localhost:8081/portefeuille/fond/validation?idFond=" + idFond;
+    
+        try {
+                ServiceEmail serviceEmail = new ServiceEmail();
+                serviceEmail.envoyer(email, "Validation de demande de fond", "Veuillez cliquer sur le lien suivant pour valider votre demande de fond : " + url);
+                return ResponseEntity.ok("Vérification par mail envoyée avec succès.");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("error", "Erreur lors de l’appel à l’API de validation", "details", e.getMessage()));
+        }
+
+        // return ResponseEntity.ok("Verification par mail envoyés");
     }
 
-    @PostMapping("/portefeuille/fond/validation")
-    public ResponseEntity<?> validationFond(@RequestHeader("Authorization") String header,
-                                            @RequestParam String email, 
-                                            @RequestParam String code) {
-        String token = header.substring(7);
-        Optional<Utilisateur> util = utilisateurRepository.findBySessionToken(token);
-
-        if (util.isEmpty()) {
-            return ResponseEntity.status(404).body(Map.of("error", "Token invalide"));
+    @GetMapping("/portefeuille/fond/validation")
+    public ResponseEntity<?> validationFond(@RequestParam long idFond) {
+        Optional<Fond> fondOpt = fondRepository.findById(idFond);
+        Fond fond = fondOpt.get();
+        fond.setIstransaction(true);
+        fondRepository.save(fond);
+        if(fond.getTypeFond().getId() == 1){
+            return ResponseEntity.ok(Map.of("message", "Demande de dépôt validée avec succès, en attente de validation de l'administrateur"));
+        }else{
+            return ResponseEntity.ok(Map.of("message", "Demande de retrait validée avec succès, en attente de validation de l'administrateur"));
         }
-
-        Utilisateur utilisateur = util.get();
-
-        // Vérifier le code de validation et l'email
-        // Supposons que nous avons une logique pour valider le code, ici simulée
-        if (code == null || !isValidCode(code)) {
-            return ResponseEntity.status(400).body(Map.of("error", "Code invalide ou expiré"));
-        }
-
-        Optional<PortefeuilleFiat[]> portefeuilleFiatOpt = porteMonnaieFiatRepository.findByUtilisateur(utilisateur);
-
-        if (portefeuilleFiatOpt.isEmpty() || portefeuilleFiatOpt.get().length == 0) {
-            return ResponseEntity.status(404).body(Map.of("error", "Portefeuille inexistant"));
-        }
-
-        PortefeuilleFiat portefeuilleFiat = portefeuilleFiatOpt.get()[0]; // Assuming only one PortefeuilleFiat per user
-
-        // Mettre à jour la quantité du portefeuille avec la nouvelle valeur
-        portefeuilleFiat.setQuantite(portefeuilleFiat.getQuantite().add(BigDecimal.valueOf(100))); // Exemple de montant ajouté
-        porteMonnaieFiatRepository.save(portefeuilleFiat);
-
-        return ResponseEntity.ok(Map.of("message", "Demande de dépôt validée avec succès"));
     }
 
     private boolean isValidCode(String code) {
         // Logique de validation du code (par exemple, vérifier si le code existe et n'est pas expiré)
         return true; // Pour la démonstration, nous retournons toujours true
     }
+
 
 
 }

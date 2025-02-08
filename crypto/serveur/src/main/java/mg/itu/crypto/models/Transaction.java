@@ -11,17 +11,12 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "annonceventeid")
-    private AnnonceVente annonceVente;
+    @Column(name = "typeTransaction", nullable = false)
+    private String typeTransaction;
 
     @ManyToOne
-    @JoinColumn(name = "vendeurid")
-    private Utilisateur vendeur;
-
-    @ManyToOne
-    @JoinColumn(name = "acheteurid")
-    private Utilisateur acheteur;
+    @JoinColumn(name = "utilisateurid")
+    private Utilisateur utilisateur;
 
     @ManyToOne
     @JoinColumn(name = "retraitid")
@@ -49,28 +44,37 @@ public class Transaction {
         this.id = id;
     }
 
-    public AnnonceVente getAnnonceVente() {
-        return annonceVente;
+    // public AnnonceVente getAnnonceVente() {
+    //     return annonceVente;
+    // }
+
+    // public void setAnnonceVente(AnnonceVente annonceVente) {
+    //     this.annonceVente = annonceVente;
+    // }
+
+    // public Utilisateur getVendeur() {
+    //     return vendeur;
+    // }
+
+    // public void setVendeur(Utilisateur vendeur) {
+    //     this.vendeur = vendeur;
+    // }
+
+    // public Utilisateur getAcheteur() {
+    //     return acheteur;
+    // }
+
+    // public void setAcheteur(Utilisateur acheteur) {
+    //     this.acheteur = acheteur;
+    // }
+
+
+    public Utilisateur getUtilisateur() {
+        return utilisateur;
     }
 
-    public void setAnnonceVente(AnnonceVente annonceVente) {
-        this.annonceVente = annonceVente;
-    }
-
-    public Utilisateur getVendeur() {
-        return vendeur;
-    }
-
-    public void setVendeur(Utilisateur vendeur) {
-        this.vendeur = vendeur;
-    }
-
-    public Utilisateur getAcheteur() {
-        return acheteur;
-    }
-
-    public void setAcheteur(Utilisateur acheteur) {
-        this.acheteur = acheteur;
+    public void setUtilisateur(Utilisateur utilisateur) {
+        this.utilisateur = utilisateur;
     }
 
     public Fond getRetrait() {
@@ -112,4 +116,13 @@ public class Transaction {
     public void setDateTransaction(LocalDateTime dateTransaction) {
         this.dateTransaction = dateTransaction;
     }
+
+    public String getTypeTransaction() {
+        return typeTransaction;
+    }
+
+    public void setTypeTransaction(String typeTransaction) {
+        this.typeTransaction = typeTransaction;
+    }
+    
 }

@@ -141,15 +141,14 @@ CREATE TABLE annoncevente (
     cryptomonnaieid INT REFERENCES cryptomonnaie(id) ON DELETE CASCADE,
     quantite NUMERIC(20, 8) NOT NULL,
     prix NUMERIC(20, 8) NOT NULL,
-    isvendue BOOLEAN DEFAULT FALSE,
+    isconfirmed BOOLEAN DEFAULT FALSE,
     date_annonce TIMESTAMP DEFAULT NOW()
 );
 
 CREATE TABLE transaction (
     id SERIAL PRIMARY KEY,
-    annonceventeid INT REFERENCES annoncevente(id) ON DELETE SET NULL,
-    vendeurid INT REFERENCES utilisateur(id) ON DELETE CASCADE,
-    acheteurid INT REFERENCES utilisateur(id) ON DELETE CASCADE,
+    typeTransaction VARCHAR(10) DEFAULT 'vente',
+    utilisateurid INT REFERENCES utilisateur(id) ON DELETE CASCADE,
     retraitid INT REFERENCES fond(id) ON DELETE SET NULL,
     depotid INT REFERENCES fond(id) ON DELETE SET NULL,
     cryptomonnaieid INT REFERENCES cryptomonnaie(id) ON DELETE CASCADE,
@@ -175,10 +174,11 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER trigger_update_portefeuille_fiat
-AFTER INSERT OR UPDATE ON fond
+AFTER UPDATE ON transaction
 FOR EACH ROW
-WHEN (NEW.isvalid = TRUE)
+WHEN (NEW.isconfirmed = TRUE AND OLD.isconfirmed = FALSE)  -- Déclenche uniquement quand `isconfirmed` passe de FALSE à TRUE
 EXECUTE PROCEDURE update_portefeuille_fiat();
+
 
 CREATE OR REPLACE FUNCTION update_portefeuille_crypto()
 RETURNS TRIGGER AS $$
