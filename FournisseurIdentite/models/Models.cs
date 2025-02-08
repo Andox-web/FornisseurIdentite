@@ -17,6 +17,9 @@ namespace FournisseurIdentite.Models
         public DateTime? DateCreation { get; set; }
 
         public string? CodeCreation { get; set; }
+
+        public string? Photo { get; set; }
+
     }
 
     public class Role

@@ -21,20 +21,13 @@ namespace FournisseurIdentite.Services
             _context = context;
         }
 
-        public bool ModifierUtilisateur(string email, string motDePasse, NewInfoUser newInfoUser)
+        public async Task<bool> ModifierUtilisateur(string email, string motDePasse, NewInfoUser newInfoUser, IFormFile photo)
         {
-            // Recherche de l'utilisateur existant par email
-            var utilisateurExistant = _context.Utilisateurs
-                .FirstOrDefault(u => u.Email == email);
+            var utilisateurExistant = _context.Utilisateurs.FirstOrDefault(u => u.Email == email);
 
             if (utilisateurExistant == null)
             {
                 throw new InvalidOperationException("Utilisateur non trouvé.");
-            }
-
-            if (string.IsNullOrEmpty(utilisateurExistant.MotDePasse))
-            {
-                throw new InvalidOperationException("Le mot de passe stocké est manquant ou invalide.");
             }
 
             if (!HashUtility.VerifyHash(motDePasse, utilisateurExistant.MotDePasse))
@@ -42,18 +35,35 @@ namespace FournisseurIdentite.Services
                 throw new InvalidOperationException("Le mot de passe est incorrect.");
             }
 
-
-            // Mise à jour des propriétés fournies
+            // Mise à jour des données utilisateur
             if (!string.IsNullOrEmpty(newInfoUser.nom) && !string.IsNullOrEmpty(newInfoUser.motDePasse))
             {
                 utilisateurExistant.Nom = newInfoUser.nom;
                 utilisateurExistant.MotDePasse = HashUtility.GenerateSecureHash(newInfoUser.motDePasse);
+
+            }
+            // Gestion de l’image si fournie
+            if (photo != null)
+            {
+                string uploadFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+                if (!Directory.Exists(uploadFolder))
+                {
+                    Directory.CreateDirectory(uploadFolder);
+                }
+
+                string uniqueFileName = $"{Guid.NewGuid()}_{photo.FileName}";
+                string filePath = Path.Combine(uploadFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await photo.CopyToAsync(fileStream);
+                }
+
+                // Mise à jour du chemin de l’image
+                utilisateurExistant.Photo = $"/uploads/{uniqueFileName}";
             }
 
-            // Sauvegarde des modifications
-
             _context.SaveChanges();
-
             return true;
         }
 

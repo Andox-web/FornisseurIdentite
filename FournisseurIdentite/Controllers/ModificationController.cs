@@ -18,11 +18,11 @@ namespace FournisseurIdentite.Controllers
         
         [HttpPut("modification")]
         [RequiresSession]
-        public IActionResult ModifierUtilisateur([FromQuery] string email, [FromQuery] string motDePasse, [FromBody] NewInfoUser utilisateurMisAJour)
+        public async Task<IActionResult> ModifierUtilisateur([FromQuery] string email, [FromQuery] string motDePasse, [FromForm] NewInfoUser utilisateurMisAJour,IFormFile photo)
         {
             try
             {
-                bool resultat = _modificationService.ModifierUtilisateur(email, motDePasse, utilisateurMisAJour);
+                bool resultat = await _modificationService.ModifierUtilisateur(email, motDePasse, utilisateurMisAJour, photo);
                 if (resultat)
                 {
                     return Ok("Utilisateur mis à jour avec succès.");
