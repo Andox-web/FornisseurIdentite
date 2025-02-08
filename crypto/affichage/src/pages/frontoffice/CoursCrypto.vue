@@ -6,8 +6,8 @@
           <div class="crypto-selector">
             <label for="cryptoSelect">Sélectionner une crypto :</label>
             <select v-model="selectedCrypto" id="cryptoSelect">
-              <option v-for="crypto in cryptos" :key="crypto" :value="crypto">
-                {{ crypto }}
+              <option v-for="crypto in cryptos" :key="crypto.id" :value="crypto.id">
+                {{ crypto.nom }}
               </option>
             </select>
           </div>
@@ -18,18 +18,18 @@
             :responsive-options="lineChart.responsiveOptions"
           >
             <template slot="header">
-              <h4 class="card-title">{{ selectedCrypto }} Chart</h4>
+              <h4 class="card-title" v-if="selectedCrypto">{{ selectedCrypto }} Chart</h4>
               <p class="card-category">24 Hours performance</p>
             </template>
             <template slot="footer">
-              <div class="legend">
+              <!-- <div class="legend">
                 <i class="fa fa-circle text-info"></i> Bitcoin
                 <i class="fa fa-circle text-danger"></i> Ethereum
                 <i class="fa fa-circle text-warning"></i> BNB
-              </div>
+              </div> -->
               <hr>
               <div class="stats">
-                <i class="fa fa-history"></i> Updated 3 minutes ago
+                <i class="fa fa-history"></i> Updated 10 seconds ago
               </div>
             </template>
           </chart-card>
@@ -52,7 +52,7 @@
             <div class="footer">
               <hr>
               <div class="stats">
-                <i class="fa fa-history"></i> Updated 3 minutes ago
+                <i class="fa fa-history"></i> Updated 10 seconds ago
               </div>
             </div>
           </card>
@@ -70,25 +70,25 @@ import Card from '../../components/Cards/Card.vue';
 export default {
   components: {
     LTable,
-    ChartCard
+    ChartCard,
+    Card
   },
   data() {
     return {
-      selectedCrypto: "Bitcoin",
-      cryptos: ["Bitcoin", "Ethereum", "BNB", "Solana"],
+      selectedCrypto: 1,
+      cryptos: [],
       lineChart: {
         data: {
-          // labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+          labels: [],
           series: {
-            Bitcoin: [5, 10, 15, 20, 700, 30, 35],
-            Ethereum: [30, 400, 600, 90, 120, 150, 180, 210],
-            BNB: [2, 4, 6, 8, 10, 12, 104],
-            Solana: [7, 40, 21, 500, 35, 240, 49]
+            test: [10000, 12000, 13000, 14000, 15000, 16000, 17000, 18000]
+            // 2: [20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000],
+            // 3: [23000, 24000, 25000, 26000, 27000, 28000, 29000, 210000]
           }
         },
         options: {
           low: 0,
-          high: 800,
+          high: 80000,
           showArea: false,
           height: '245px',
           axisX: {
@@ -102,39 +102,94 @@ export default {
             right: 50
           }
         },
-        responsiveOptions: [
-          [
-            'screen and (max-width: 640px)',
-            {
-              axisX: {
-                labelInterpolationFnc(value) {
-                  return value[0];
-                }
-              }
-            }
-          ]
-        ]
       },
       tableData: {
-        data: [
-          { nom: 'Bitcoin', prix: 10505 },
-          { nom: 'Ethereum', prix: 10405 },
-          { nom: 'BNB', prix: 5007 },
-          { nom: 'Solana', prix: 7087 }
-        ]
-      }
+        data: [],
+        columns: ['Nom', 'Prix']
+      },
+      interval: null
     };
   },
   computed: {
     filteredChartData() {
       return {
         labels: this.lineChart.data.labels,
-        series: [this.lineChart.data.series[this.selectedCrypto]]
+        series: [this.lineChart.data.series.test || []]
       };
+    }
+  },
+  watch: {
+    async selectedCrypto(newVal) {
+      if (newVal) {
+        await this.fetchCours();
+      }
+    }
+  },
+
+  methods: {
+    async fetchCryptos() {
+      try {
+        const response = await fetch('http://localhost:8081/cryptos');
+        const data = await response.json();
+        this.cryptos = data.map(c => c);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des cryptos", error);
+      }
+    },
+    async fetchCours() {
+      if (!this.selectedCrypto) return;
+      try {
+        const selected = this.selectedCrypto;
+        console.log(selected);
+        if (!selected) return;
+        console.log("fetching cours .");
+
+        const response = await fetch(`http://localhost:8081/cryptos/cours?id=${selected}`);
+        
+        const data = await response.json();
+        console.log(data);
+        // this.lineChart.data.series = data.map(d => d.valeur);
+        // this.lineChart.data.series = [data.map(d => d.valeur)];
+        this.lineChart.data.series.test = data.map(d => d.valeur);
+
+      } catch (error) {
+        console.error("Erreur lors de la récupération du cours", error);
+      }
+    },
+    async fetchPrix() {
+      try {
+        const response = await fetch('http://localhost:8081/cryptos/prix');
+        const data = await response.json();
+        this.tableData.data = data.map(item => ({
+          nom: item.cryptomonnaie.nom,
+          prix: item.valeur
+        }));
+      } catch (error) {
+        console.error("Erreur lors de la récupération des prix", error);
+      }
+    },
+    startAutoRefresh() {
+      this.interval = setInterval( async() => {
+       await this.fetchCours();
+       await this.fetchPrix();
+      }, 10000);
+    }
+  },
+  mounted() {
+    this.fetchCryptos().then(async () => {
+      await this.fetchCours();
+      await this.fetchPrix();
+      await this.startAutoRefresh();
+    });
+  },
+  beforeDestroy() {
+    if (this.interval) {
+      clearInterval(this.interval);
     }
   }
 };
 </script>
+
 
 <style>
 .crypto-selector {

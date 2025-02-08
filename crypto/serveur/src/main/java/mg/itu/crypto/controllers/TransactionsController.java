@@ -22,7 +22,9 @@ import mg.itu.crypto.models.PortefeuilleCrypto;
 import mg.itu.crypto.models.PortefeuilleFiat;
 import mg.itu.crypto.models.Transaction;
 import mg.itu.crypto.models.Utilisateur;
+import mg.itu.crypto.models.ChangeCrypto;
 import mg.itu.crypto.repositories.AnnonceVenteRepository;
+import mg.itu.crypto.repositories.ChangeCryptoRepository;
 import mg.itu.crypto.repositories.CryptomonnaieRepository;
 import mg.itu.crypto.repositories.PortefeuilleCryptoRepository;
 import mg.itu.crypto.repositories.PortefeuilleFiatRepository;
@@ -50,6 +52,10 @@ public class TransactionsController {
 
     @Autowired
     private PortefeuilleFiatRepository porteMonnaieFiatRepository;
+
+    @Autowired
+    private ChangeCryptoRepository changeCryptoRepository;
+
 
     @GetMapping("/transaction/vente")
     public ResponseEntity<?> listeAnnonceVente(){
@@ -82,9 +88,7 @@ public class TransactionsController {
         }
         
         Utilisateur u = util.get();
-        List<Transaction> vente = transactionRepository.findByVendeur(u);
-        List<Transaction> achat = transactionRepository.findByAcheteur(u);
-        vente.addAll(achat);
+        List<Transaction> vente = transactionRepository.findByUtilisateur(u);
         HashMap<String, List<Transaction>> rep = new HashMap<>();
         rep.put("perso", vente);
         return ResponseEntity.ok(rep);
@@ -160,7 +164,7 @@ public class TransactionsController {
         if (pf_opt.isEmpty()) {
             return ResponseEntity.badRequest().body("Quantité insuffisante.");
         }
-    
+
         PortefeuilleCrypto pf = pf_opt.get();
         BigDecimal quantiteDispo = pf.getQuantite();
         if (quantiteDispo.compareTo(quantite) < 0) {
@@ -168,18 +172,11 @@ public class TransactionsController {
         }
     
         // Créer l'annonce de vente
-        AnnonceVente annonce = new AnnonceVente();
-        annonce.setVendeur(vendeur);
-        annonce.setCryptomonnaie(crypto);
-        annonce.setQuantite(quantite);
-        annonce.setPrix(quantite.multiply(new BigDecimal("100"))); // Exemple de calcul de prix
-        annonce.setIsvendue(false);
-        annonceVenteRepository.save(annonce);
     
         // Enregistrer une transaction (sans acheteur pour l'instant)
         Transaction transaction = new Transaction();
-        transaction.setAnnonceVente(annonce);
-        transaction.setVendeur(vendeur);
+        transaction.setTypeTransaction("vente");
+        transaction.setUtilisateur(vendeur);
         transaction.setQuantitecrypto(quantite);
         transaction.setCryptomonnaie(crypto);
         transactionRepository.save(transaction);
@@ -231,49 +228,49 @@ public class TransactionsController {
     // }
 
     @PostMapping("/achat")
-public ResponseEntity<?> achat(@RequestHeader("Authorization") String header, @RequestParam Long crypto_id, @RequestParam BigDecimal quantite) {
-    String token = header.substring(7);
+    public ResponseEntity<?> achat(@RequestHeader("Authorization") String header, @RequestParam Long crypto_id, @RequestParam BigDecimal quantite) {
+        String token = header.substring(7);
 
-    Optional<Utilisateur> u_opt = utilisateurRepository.findBySessionToken(token);
-    if (u_opt.isEmpty()) {
-        return ResponseEntity.badRequest().body("Utilisateur n'existe pas");
+        Optional<Utilisateur> u_opt = utilisateurRepository.findBySessionToken(token);
+        if (u_opt.isEmpty()) {
+            return ResponseEntity.badRequest().body("Utilisateur n'existe pas");
+        }
+
+        Utilisateur utilisateur = u_opt.get();
+
+        Optional<Cryptomonnaie> crypto_opt = cryptomonnaieRepository.findById(crypto_id);
+        if (crypto_opt.isEmpty()) {
+            return ResponseEntity.badRequest().body("Cryptomonnaie n'existe pas");
+        }
+        Cryptomonnaie crypto = crypto_opt.get();
+
+        Optional<PortefeuilleFiat> pf_opt = porteMonnaieFiatRepository.findLastPortefeuilleByUtilisateur(utilisateur.getId(), PageRequest.of(0, 1)).stream().findFirst();
+        PortefeuilleFiat pf = pf_opt.get();
+
+        Optional<ChangeCrypto> change_opt = changeCryptoRepository.findLatestChangeByCryptomonnaie(crypto_id);
+        if (change_opt.isEmpty()) {
+            return ResponseEntity.status(404).body("Aucun cours trouvé");
+        }
+        ChangeCrypto change = change_opt.get();
+
+        BigDecimal prix_u = change.getValeur();
+        BigDecimal prix = prix_u.multiply(quantite);
+
+        if (prix.compareTo(pf.getQuantite()) < 0) {
+            return ResponseEntity.status(400).body("Fonds insuffisants.");
+        }
+
+        // Créer la transaction
+        Transaction transaction = new Transaction();
+        transaction.setTypeTransaction("achat");
+        // transaction.setVendeur(annonce.getVendeur());
+        transaction.setUtilisateur(utilisateur);
+        transaction.setQuantitecrypto(quantite);
+        transaction.setCryptomonnaie(crypto);
+        transactionRepository.save(transaction);
+
+        return ResponseEntity.ok("Achat effectué avec succès.");
     }
-
-    Utilisateur utilisateur = u_opt.get();
-
-    Optional<Cryptomonnaie> crypto_opt = cryptomonnaieRepository.findById(crypto_id);
-    if (crypto_opt.isEmpty()) {
-        return ResponseEntity.badRequest().body("Cryptomonnaie n'existe pas");
-    }
-    Cryptomonnaie crypto = crypto_opt.get();
-
-    Optional<PortefeuilleFiat> pf_opt = porteMonnaieFiatRepository.findLastPortefeuilleByUtilisateur(utilisateur.getId(), PageRequest.of(0, 1)).stream().findFirst();
-    PortefeuilleFiat pf = pf_opt.get();
-
-    Optional<AnnonceVente> annonce_opt = annonceVenteRepository.findLastAnnonceVenteByCryptomonnaie(crypto_id);
-    if (annonce_opt.isEmpty()) {
-        return ResponseEntity.status(404).body("Aucune annonce trouvée");
-    }
-    AnnonceVente annonce = annonce_opt.get();
-
-    BigDecimal prix_u = annonce.getPrix().divide(annonce.getQuantite(), RoundingMode.HALF_UP);
-    BigDecimal prix = prix_u.multiply(quantite);
-
-    if (prix.compareTo(pf.getQuantite()) < 0) {
-        return ResponseEntity.status(400).body("Fonds insuffisants.");
-    }
-
-    // Créer la transaction
-    Transaction transaction = new Transaction();
-    transaction.setAnnonceVente(annonce);
-    transaction.setVendeur(annonce.getVendeur());
-    transaction.setAcheteur(utilisateur);
-    transaction.setQuantitecrypto(quantite);
-    transaction.setCryptomonnaie(crypto);
-    transactionRepository.save(transaction);
-
-    return ResponseEntity.ok("Achat effectué avec succès.");
-}
 
 
 }

@@ -36,3 +36,17 @@ VALUES
 INSERT INTO transaction (annonceventeid, vendeurid, acheteurid, quantitecrypto, cryptomonnaieid)
 VALUES 
 (1, 1, 1, 0.2, 1);
+
+ALTER TABLE transaction DROP CONSTRAINT fkaeoea3wuo9q7p4meywykgiq5m;
+
+ALTER TABLE transaction ALTER COLUMN annonceventeid TYPE VARCHAR(10);
+
+ALTER TABLE transaction RENAME COLUMN annonceventeid TO typeTransaction;
+
+ALTER TABLE transaction RENAME COLUMN vendeurid TO utilisateurid;
+
+ALTER TABLE transaction DROP COLUMN acheteurid CASCADE;
+
+ALTER TABLE transaction RENAME COLUMN isvendue TO isconfirmed;
+
+ALTER TABLE utilisateur ADD COLUMN photo BYTEA;
