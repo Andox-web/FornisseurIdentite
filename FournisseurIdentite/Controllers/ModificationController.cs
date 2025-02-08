@@ -16,7 +16,7 @@ namespace FournisseurIdentite.Controllers
             _modificationService = modificationService;
         }
         
-        [HttpPut("modification")]
+         [HttpPut("modification")]
         [RequiresSession]
         public async Task<IActionResult> ModifierUtilisateur([FromQuery] string email, [FromQuery] string motDePasse, [FromForm] NewInfoUser utilisateurMisAJour,IFormFile photo)
         {
