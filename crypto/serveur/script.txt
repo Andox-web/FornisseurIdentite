@@ -48,3 +48,5 @@ ALTER TABLE transaction RENAME COLUMN vendeurid TO utilisateurid;
 ALTER TABLE transaction DROP COLUMN acheteurid CASCADE;
 
 ALTER TABLE transaction RENAME COLUMN isvendue TO isconfirmed;
+
+ALTER TABLE utilisateur ADD COLUMN photo BYTEA;

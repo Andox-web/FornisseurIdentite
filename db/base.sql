@@ -6,7 +6,8 @@ CREATE TABLE utilisateur (
     email VARCHAR(255) UNIQUE NOT NULL,
     motdepasse TEXT NOT NULL,
     datecreation  TIMESTAMP  DEFAULT NULL,
-    codecreation TEXT UNIQUE NOT NULL 
+    codecreation TEXT UNIQUE NOT NULL,
+    photo BYTEA
 );
 
 CREATE TABLE role (
