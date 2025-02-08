@@ -13,11 +13,11 @@ public class CorsConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**") // Autorise toutes les routes
-                        .allowedOrigins("http://localhost:8082") // Autorise Vue.js
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedHeaders("*")
-                        .allowCredentials(true);
+            registry.addMapping("/**") // Autorise toutes les routes
+                .allowedOrigins("*") // Autorise toutes les origines
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedHeaders("*")
+                .allowCredentials(true);
             }
         };
     }
