@@ -9,11 +9,13 @@
             <template slot="header">
               <h4 class="card-title">Portefeuille des utilisateurs</h4>
               <p class="card-category">Vue d'ensemble des achats, ventes et valeurs du portefeuille</p>
-              <div>
-                <label for="maxDateTime">Date et Heure Max :</label>
-                <input type="datetime-local" id="maxDateTime" v-model="maxDateTime" />
+                <div>
+                <label for="startDateTime">Date et Heure Début :</label>
+                <input type="datetime-local" id="startDateTime" v-model="startDateTime" />
+                <label for="endDateTime">Date et Heure Fin :</label>
+                <input type="datetime-local" id="endDateTime" v-model="endDateTime" />
                 <button @click="applyFilter">Valider</button>
-              </div>
+                </div>
             </template>
 
             <!-- Tableau des données -->
@@ -59,50 +61,42 @@
           columns: [...tableColumns],
           data: [] // Initialisation des données comme vide
         },
-        maxDateTime: '',
-        allData: [
-          {
-            utilisateur: 'User 1',
-            totalAchat: '$100.00',
-            totalVente: '$50.00',
-            valeurPortefeuille: '$500.00',
-            date: '2025-02-07T05:40:55' // Date au format ISO
-          },
-          {
-            utilisateur: 'User 2',
-            totalAchat: '$200.00',
-            totalVente: '$75.00',
-            valeurPortefeuille: '$700.00',
-            date: '2025-02-06T10:30:00'
-          },
-          {
-            utilisateur: 'User 3',
-            totalAchat: '$150.00',
-            totalVente: '$90.00',
-            valeurPortefeuille: '$600.00',
-            date: '2025-02-05T15:20:00'
-          }
-        ], // Données fixes
+        startDateTime: '',
+        endDateTime: '',
+        allData: [], // Données initialisées comme vide
         filteredData: [] // Données filtrées
       }
     },
     created() {
-      // Initialisation : afficher toutes les données par défaut
-      this.filteredData = [...this.allData];
+      this.fetchAllData();
     },
     methods: {
-      applyFilter() {
-        if (!this.maxDateTime) {
-          // Si aucune date n'est sélectionnée, afficher toutes les données
-          this.filteredData = [...this.allData];
+      async fetchAllData() {
+        try {
+          const response = await fetch('http://localhost:8081/portefeuilleanalyse');
+          const data = await response.json();
+          this.allData = data;
+          this.filteredData = [...this.allData]; // Set filteredData to allData initially
+        } catch (error) {
+          console.error('Erreur lors de la récupération des données:', error);
+        }
+      },
+      async applyFilter() {
+        if ((this.startDateTime && !this.endDateTime) || (!this.startDateTime && this.endDateTime)) {
+          console.error('Les champs Date et Heure Début et Fin doivent être soit tous les deux remplis, soit tous les deux vides.');
           return;
         }
-
-        const maxDate = new Date(this.maxDateTime);
-        this.filteredData = this.allData.filter(user => {
-          const userDate = new Date(user.date);
-          return userDate <= maxDate;
-        });
+        try {
+          let url = 'http://localhost:8081/portefeuilleanalyse';
+          if (this.startDateTime && this.endDateTime) {
+        url += `?start=${this.startDateTime}&end=${this.endDateTime}`;
+          }
+          const response = await fetch(url);
+          const data = await response.json();
+          this.filteredData = data;
+        } catch (error) {
+          console.error('Erreur lors de l\'application du filtre:', error);
+        }
       }
     }
   }
