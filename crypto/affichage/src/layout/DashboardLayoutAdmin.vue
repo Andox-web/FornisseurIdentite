@@ -18,6 +18,10 @@
         <i class="nc-icon nc-credit-card"></i> 
         <p>Wallets</p>
       </sidebar-link>
+      <sidebar-link to="/admin/analyse">
+        <i class="nc-icon nc-chart-bar-32"></i> 
+        <p>Analyse</p>
+      </sidebar-link>
     </side-bar>
     <div class="main-panel">
       <top-navbar></top-navbar>

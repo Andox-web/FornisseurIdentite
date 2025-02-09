@@ -1,4 +1,4 @@
-package mg.itu.crypto;
+package mg.itu.crypto.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,11 +13,11 @@ public class CorsConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-            registry.addMapping("/**") // Autorise toutes les routes
-                .allowedOrigins("*") // Autorise toutes les origines
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("*")
-                .allowCredentials(true);
+                registry.addMapping("/**")
+                        .allowedOriginPatterns("*") // Allow all origins with patterns
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                        .allowedHeaders("*")
+                        .allowCredentials(true);
             }
         };
     }

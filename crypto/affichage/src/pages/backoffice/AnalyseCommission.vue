@@ -22,7 +22,7 @@
                 <label for="crypto">Cryptomonnaie</label>
                 <select v-model="selectedCrypto" class="form-control">
                   <option value="tous">Tous</option>
-                  <option v-for="cryptoOption in cryptos" :key="cryptoOption.value" :value="cryptoOption.value">
+                  <option v-for="cryptoOption in cryptos" :key="cryptoOption.id" :value="cryptoOption.id">
                     {{ cryptoOption.name }}
                   </option>
                 </select>
@@ -61,6 +61,7 @@
   
   <script>
   import Card from 'src/components/Cards/Card.vue';
+  import axios from 'axios';
   
   export default {
     components: {
@@ -71,11 +72,11 @@
         typeAnalyse: '', // Type d'analyse sélectionné (Somme, Moyenne)
         selectedCrypto: 'tous', // Cryptomonnaie sélectionnée
         cryptos: [ // Liste des cryptomonnaies
-          { name: 'Bitcoin (BTC)', value: 'bitcoin' },
-          { name: 'Ethereum (ETH)', value: 'ethereum' },
-          { name: 'Tether (USDT)', value: 'usdt' },
-          { name: 'Litecoin (LTC)', value: 'litecoin' },
-          { name: 'Ripple (XRP)', value: 'ripple' },
+          { name: 'Bitcoin (BTC)', id: 'bitcoin' },
+          { name: 'Ethereum (ETH)', id: 'ethereum' },
+          { name: 'Tether (USDT)', id: 'usdt' },
+          { name: 'Litecoin (LTC)', id: 'litecoin' },
+          { name: 'Ripple (XRP)', id: 'ripple' },
         ],
         dateMin: '',      // Date min
         dateMax: '',      // Date max
@@ -83,33 +84,36 @@
       };
     },
     methods: {
-      submitAnalysis() {
+      async fetchCryptos() {
+        try {
+          const response = await axios.get('http://localhost:8081/api/cryptos');
+          this.cryptos = response.data;
+        } catch (error) {
+          console.error('Error fetching cryptos:', error);
+        }
+      },
+      async submitAnalysis() {
         // Vérifier si les paramètres sont définis
         if (!this.dateMin || !this.dateMax) {
           alert("Veuillez définir une plage de dates.");
           return;
         }
   
-        // Logique d'analyse pour calculer la somme ou la moyenne des commissions (exemple fictif)
-        if (this.selectedCrypto === 'tous') {
-          this.result = 'Analyse de toutes les cryptomonnaies pour la période ' + this.dateMin + ' à ' + this.dateMax;
-        } else {
-          this.result = 'Analyse des commissions pour ' + this.selectedCrypto + ' entre ' + this.dateMin + ' et ' + this.dateMax;
-        }
-  
-        // Exemple de calcul de somme ou moyenne (à remplacer par des données réelles)
-        switch (this.typeAnalyse) {
-          case 'somme':
-            this.result += ': Somme des commissions : 1500 USD';
-            break;
-          case 'moyenne':
-            this.result += ': Moyenne des commissions : 250 USD';
-            break;
-          default:
-            this.result += ': Aucun type d\'analyse sélectionné';
-            break;
+        try {
+          const response = await axios.post('http://localhost:8081/api/analyseCommission', {
+            typeAnalyse: this.typeAnalyse,
+            selectedCrypto: this.selectedCrypto,
+            dateMin: this.dateMin,
+            dateMax: this.dateMax
+          });
+          this.result = response.data.result;
+        } catch (error) {
+          console.error('Error performing analysis:', error);
         }
       }
+    },
+    created() {
+      this.fetchCryptos();
     }
   };
   </script>
@@ -192,4 +196,3 @@
     font-weight: 600;
   }
   </style>
-  

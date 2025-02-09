@@ -148,6 +148,26 @@ CREATE TABLE transaction (
     datetransaction TIMESTAMP DEFAULT NOW()
 );
 
+CREATE TABLE Commission (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    achat_commission DECIMAL(19, 4) DEFAULT 0.0,
+    vente_commission DECIMAL(19, 4) DEFAULT 0.0,
+    crypto_id BIGINT,
+    date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (crypto_id) REFERENCES Cryptomonnaie(id)
+);
+
+CREATE TABLE pourcentage_commission (
+    id SERIAL PRIMARY KEY,
+    achat_commission DECIMAL(5, 4) NOT NULL,
+    vente_commission DECIMAL(5, 4) NOT NULL,
+    date TIMESTAMP NOT NULL
+);
+
+-- Insert initial commission percentages
+INSERT INTO pourcentage_commission (achat_commission, vente_commission, date) VALUES
+(0.005, 0.005, NOW());
+
 CREATE OR REPLACE FUNCTION update_portefeuille_fiat()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -171,11 +191,10 @@ FOR EACH ROW
 WHEN (NEW.isvalid = TRUE)
 EXECUTE PROCEDURE update_portefeuille_fiat();
 
-
 CREATE OR REPLACE FUNCTION update_portefeuille_crypto()
 RETURNS TRIGGER AS $$
 BEGIN
-    IF NEW.isconfirmed = TRUE THEN
+    IF NEW.isconfirmed = TRUE AND OLD.isconfirmed = FALSE THEN
         IF NEW.typetransactionid = (SELECT id FROM typetransaction WHERE type = 'achat') THEN
             -- Achat: Ajouter crypto
             UPDATE portemonnaiecrypto
@@ -196,5 +215,86 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER trigger_update_portefeuille_crypto
 AFTER INSERT ON transaction
 FOR EACH ROW
-WHEN (NEW.isconfirmed = TRUE AND OLD.isconfirmed = FALSE)
 EXECUTE PROCEDURE update_portefeuille_crypto();
+
+CREATE OR REPLACE FUNCTION insert_commission()
+RETURNS TRIGGER AS $$
+DECLARE
+    commission_record RECORD;
+    achat_commission_value DECIMAL(19, 4);
+    vente_commission_value DECIMAL(19, 4);
+BEGIN
+    IF NEW.isconfirmed = TRUE AND OLD.isconfirmed = FALSE THEN
+        -- Fetch the current commission percentages
+        SELECT achat_commission, vente_commission INTO commission_record
+        FROM pourcentage_commission
+        WHERE date <= NOW()
+        ORDER BY date DESC
+        LIMIT 1;
+
+        -- Calculate the commission based on the transaction type
+        IF NEW.typetransaction = 'achat' THEN
+            achat_commission_value := NEW.quantitecrypto * commission_record.achat_commission;
+            INSERT INTO Commission (achat_commission, crypto_id, date)
+            VALUES (achat_commission_value, NEW.cryptomonnaieid, NOW());
+        ELSIF NEW.typetransaction = 'vente' THEN
+            vente_commission_value := NEW.quantitecrypto * commission_record.vente_commission;
+            INSERT INTO Commission (vente_commission, crypto_id, date)
+            VALUES (vente_commission_value, NEW.cryptomonnaieid, NOW());
+        END IF;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_insert_commission
+AFTER UPDATE ON transaction
+FOR EACH ROW
+EXECUTE PROCEDURE insert_commission();
+
+INSERT INTO cryptomonnaie (nom, abrev) VALUES
+('Bitcoin', 'BTC'),
+('Ethereum', 'ETH'),
+('Ripple', 'XRP'),
+('Litecoin', 'LTC'),
+('Bitcoin Cash', 'BCH'),
+('Cardano', 'ADA'),
+('Polkadot', 'DOT'),
+('Binance Coin', 'BNB'),
+('Stellar', 'XLM'),
+('Dogecoin', 'DOGE');
+
+
+CREATE OR REPLACE FUNCTION update_crypto_values()
+RETURNS void AS $$
+DECLARE
+    crypto_rec RECORD;
+    last_val NUMERIC(20,8);
+    new_val NUMERIC(20,8);
+    adjustment NUMERIC(20,8);
+BEGIN
+    FOR crypto_rec IN SELECT id FROM cryptomonnaie LOOP
+        -- Récupérer la dernière valeur enregistrée pour la crypto
+        SELECT valeur INTO last_val
+        FROM changecrypto
+        WHERE cryptomonnaieid = crypto_rec.id
+        ORDER BY datechangement DESC
+        LIMIT 1;
+        
+        -- Si aucune valeur n'existe, on utilise 10000
+        IF last_val IS NULL THEN
+            last_val := 10000;
+        END IF;
+        
+        -- Calcul d'une variation aléatoire entre -1% et +1%
+        adjustment := random() * 0.02 - 0.01;  -- random() donne une valeur entre 0 et 1
+        new_val := last_val * (1 + adjustment);
+        new_val := round(new_val, 8);
+        
+        -- Insertion du nouveau changement de valeur
+        INSERT INTO changecrypto (cryptomonnaieid, valeur, datechangement)
+        VALUES (crypto_rec.id, new_val, NOW());
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;

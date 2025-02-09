@@ -101,6 +101,11 @@ const routes = [
         path: 'wallets',
         name: 'Wallets',
         component: Wallets
+      },
+      {
+        path: 'analyse',
+        name: 'Analyse',
+        component: Analyse
       }
     ]
   },

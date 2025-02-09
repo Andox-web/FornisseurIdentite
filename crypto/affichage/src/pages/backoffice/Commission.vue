@@ -51,6 +51,7 @@
   
   <script>
   import Card from 'src/components/Cards/Card.vue';
+  import axios from 'axios';
   
   export default {
     components: {
@@ -63,20 +64,39 @@
       };
     },
     methods: {
-      submitCommission(type) {
-        // Vérifier que le type est bien défini
+      async fetchCurrentCommissions() {
+        try {
+          const response = await axios.get('http://localhost:8081/api/getCurrentCommissions');
+          this.commissionAchat = response.data.achatCommission;
+          this.commissionVente = response.data.venteCommission;
+        } catch (error) {
+          console.error('Error fetching current commissions:', error);
+          alert('Erreur lors de la récupération des commissions actuelles');
+        }
+      },
+      async submitCommission(type) {
         let commission = 0;
   
-        // Définir la commission en fonction du type
         if (type === 'achat') {
           commission = this.commissionAchat;
         } else if (type === 'vente') {
           commission = this.commissionVente;
         }
   
-        // Afficher l'alerte avec la valeur de commission correspondante
-        alert(`${type === 'achat' ? 'Commission d\'achat' : 'Commission de vente'} modifiée à ${commission}%`);
+        try {
+          await axios.post('http://localhost:8081/api/updateCommission', {
+            achatCommission: type === 'achat' ? commission : this.commissionAchat,
+            venteCommission: type === 'vente' ? commission : this.commissionVente
+          });
+          alert(`${type === 'achat' ? 'Commission d\'achat' : 'Commission de vente'} modifiée à ${commission}%`);
+        } catch (error) {
+          console.error('Error updating commission:', error);
+          alert('Erreur lors de la mise à jour de la commission');
+        }
       }
+    },
+    mounted() {
+      this.fetchCurrentCommissions();
     }
   };
   </script>
@@ -159,4 +179,3 @@
     margin-top: 10px;
   }
   </style>
-  

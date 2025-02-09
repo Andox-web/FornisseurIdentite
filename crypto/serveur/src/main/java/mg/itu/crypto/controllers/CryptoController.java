@@ -35,6 +35,12 @@ public class CryptoController {
         return ResponseEntity.ok(cryptos);
     }
 
+    @GetMapping("api/cryptos")
+    public ResponseEntity<?> getapiCryptos() {
+        List<Cryptomonnaie> cryptos = cryptomonnaieRepository.findAll();
+        return ResponseEntity.ok(cryptos);
+    }
+
     @GetMapping("/cryptos/cours")
     public ResponseEntity<?> getCours(@RequestParam Long id) {
         // Optional<Cryptomonnaie> crypto = cryptomonnaieRepository.findById(id);
