@@ -67,6 +67,21 @@ services:
   #   networks:
   #     - backend
 
+
+  ngrok-proxy:
+    build:
+      context: ./ngrok
+      dockerfile: ngrok.Dockerfile
+    environment:
+      - NGROK_AUTHTOKEN=2soBaTXlcu5xrPAVaPEiOHAtQRK_7aKnuJ5Ne429efCXUkEzR
+      - Webapi_URL=webapi:8080
+      - Cryptoserveur_URL=cryptoserveur:8080
+    depends_on:
+      - webapi
+      - cryptoserveur
+    networks:
+      - backend
+
 networks:
   backend:
     driver: bridge
