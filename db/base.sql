@@ -136,24 +136,25 @@ CREATE TABLE fond (
     datefond TIMESTAMP DEFAULT NOW()
 );
 
-CREATE TABLE annoncevente (
+CREATE TABLE typetransaction (
     id SERIAL PRIMARY KEY,
-    vendeurid INT REFERENCES utilisateur(id) ON DELETE CASCADE,
-    cryptomonnaieid INT REFERENCES cryptomonnaie(id) ON DELETE CASCADE,
-    quantite NUMERIC(20, 8) NOT NULL,
-    prix NUMERIC(20, 8) NOT NULL,
-    isconfirmed BOOLEAN DEFAULT FALSE,
-    date_annonce TIMESTAMP DEFAULT NOW()
+    type VARCHAR(50) NOT NULL,
+    description TEXT
 );
+
+INSERT INTO typetransaction (type, description) 
+VALUES ('vente', 'Transaction de vente'), 
+       ('achat', 'Transaction d achat');
 
 CREATE TABLE transaction (
     id SERIAL PRIMARY KEY,
-    typeTransaction VARCHAR(10) DEFAULT 'vente',
+    typetransactionid INT REFERENCES typetransaction(id) ON DELETE SET NULL,
     utilisateurid INT REFERENCES utilisateur(id) ON DELETE CASCADE,
     retraitid INT REFERENCES fond(id) ON DELETE SET NULL,
     depotid INT REFERENCES fond(id) ON DELETE SET NULL,
     cryptomonnaieid INT REFERENCES cryptomonnaie(id) ON DELETE CASCADE,
     quantitecrypto NUMERIC(20, 8) NOT NULL,
+    isconfirme BOOLEAN DEFAULT FALSE,
     datetransaction TIMESTAMP DEFAULT NOW()
 );
 
@@ -175,26 +176,24 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER trigger_update_portefeuille_fiat
-AFTER UPDATE ON transaction
+AFTER INSERT ON fond
 FOR EACH ROW
-WHEN (NEW.isconfirmed = TRUE AND OLD.isconfirmed = FALSE)  -- Déclenche uniquement quand `isconfirmed` passe de FALSE à TRUE
+WHEN (NEW.isvalid = TRUE)
 EXECUTE PROCEDURE update_portefeuille_fiat();
 
 
 CREATE OR REPLACE FUNCTION update_portefeuille_crypto()
 RETURNS TRIGGER AS $$
 BEGIN
-    UPDATE portemonnaiecrypto
-    SET quantite = quantite + NEW.quantitecrypto
-    WHERE utilisateurid = NEW.acheteurid AND cryptomonnaieid = NEW.cryptomonnaieid;
+    IF NEW.isconfirme = TRUE THEN
+        UPDATE portemonnaiecrypto
+        SET quantite = quantite + NEW.quantitecrypto
+        WHERE utilisateurid = NEW.utilisateurid AND cryptomonnaieid = NEW.cryptomonnaieid;
 
-    UPDATE portemonnaiecrypto
-    SET quantite = quantite - NEW.quantitecrypto
-    WHERE utilisateurid = NEW.vendeurid AND cryptomonnaieid = NEW.cryptomonnaieid;
-
-    UPDATE annoncevente
-    SET isvendue = TRUE
-    WHERE id = NEW.annonceventeid;
+        UPDATE portemonnaiecrypto
+        SET quantite = quantite - NEW.quantitecrypto
+        WHERE utilisateurid = (SELECT utilisateurid FROM fond WHERE id = NEW.retraitid) AND cryptomonnaieid = NEW.cryptomonnaieid;
+    END IF;
 
     RETURN NEW;
 END;
