@@ -15,4 +15,10 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     @Query(value="SELECT t FROM Transaction t where t.isconfirmed = false", nativeQuery = true)
     List<Transaction> findUnconfirmedTransactions();
 
+    @Query(value="SELECT COUNT(t) FROM Transaction t WHERE t.typeFond='achat' AND t.cryptomonnaieid = :idCrypto", nativeQuery = true)
+    long countAchat();
+
+    @Query(value="SELECT COUNT(t) FROM Transaction t WHERE t.typeFond='vente' AND t.cryptomonnaieid = :idCrypto", nativeQuery = true)
+    long countVente();
+
 }
