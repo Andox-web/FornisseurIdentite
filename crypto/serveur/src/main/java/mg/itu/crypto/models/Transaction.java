@@ -11,28 +11,31 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "typeTransaction", nullable = false)
     private String typeTransaction;
 
     @ManyToOne
-    @JoinColumn(name = "utilisateurid")
+    @JoinColumn(name = "utilisateurid", nullable = false)
     private Utilisateur utilisateur;
 
     @ManyToOne
-    @JoinColumn(name = "retraitid")
+    @JoinColumn(name = "retraitid", nullable = true)
     private Fond retrait;
 
     @ManyToOne
-    @JoinColumn(name = "depotid")
+    @JoinColumn(name = "depotid", nullable = true)
     private Fond depot;
 
     @ManyToOne
-    @JoinColumn(name = "cryptomonnaieid")
+    @JoinColumn(name = "cryptomonnaieid", nullable = false)
     private Cryptomonnaie cryptomonnaie;
 
     @Column(nullable = false, precision = 20, scale = 8)
     private BigDecimal quantitecrypto;
 
+    @Column(nullable = false)
+    private Boolean isConfirmed = false;
+
+    @Column(nullable = false)
     private LocalDateTime dateTransaction = LocalDateTime.now();
 
     // Getters and Setters
@@ -44,30 +47,13 @@ public class Transaction {
         this.id = id;
     }
 
-    // public AnnonceVente getAnnonceVente() {
-    //     return annonceVente;
-    // }
+    public String getTypeTransaction() {
+        return typeTransaction;
+    }
 
-    // public void setAnnonceVente(AnnonceVente annonceVente) {
-    //     this.annonceVente = annonceVente;
-    // }
-
-    // public Utilisateur getVendeur() {
-    //     return vendeur;
-    // }
-
-    // public void setVendeur(Utilisateur vendeur) {
-    //     this.vendeur = vendeur;
-    // }
-
-    // public Utilisateur getAcheteur() {
-    //     return acheteur;
-    // }
-
-    // public void setAcheteur(Utilisateur acheteur) {
-    //     this.acheteur = acheteur;
-    // }
-
+    public void setTypeTransaction(String typeTransaction) {
+        this.typeTransaction = typeTransaction;
+    }
 
     public Utilisateur getUtilisateur() {
         return utilisateur;
@@ -109,6 +95,14 @@ public class Transaction {
         this.quantitecrypto = quantitecrypto;
     }
 
+    public Boolean getIsConfirmed() {
+        return isConfirmed;
+    }
+
+    public void setIsConfirmed(Boolean isConfirmed) {
+        this.isConfirmed = isConfirmed;
+    }
+
     public LocalDateTime getDateTransaction() {
         return dateTransaction;
     }
@@ -116,13 +110,4 @@ public class Transaction {
     public void setDateTransaction(LocalDateTime dateTransaction) {
         this.dateTransaction = dateTransaction;
     }
-
-    public String getTypeTransaction() {
-        return typeTransaction;
-    }
-
-    public void setTypeTransaction(String typeTransaction) {
-        this.typeTransaction = typeTransaction;
-    }
-    
 }
