@@ -125,6 +125,15 @@ namespace FournisseurIdentite.Controllers
                 return BadRequest(new { message = "Mot de passe erroné." });
             }
 
+            // Vérifier si l'utilisateur est un admin
+            var isAdmin = _dbContext.UtilisateurRoles
+                .Any(ur => ur.UtilisateurId == utilisateur.Id && ur.Role.Nom == "admin");
+
+            if (isAdmin)
+            {
+                return BadRequest(new { message = "Les administrateurs doivent utiliser la méthode de connexion admin." });
+            }
+
             // Générer un code PIN de vérification
             var pin = _authentificationService.GeneratePin();
             // Ajouter le PIN à la table authentification
@@ -135,6 +144,43 @@ namespace FournisseurIdentite.Controllers
             serviceEmail.EnvoyerAsync(utilisateur.Email, "Code de vérification", $"Votre code PIN est : {pin}");
 
             return Ok(new { message = "Identité à confirmer. Un code PIN a été envoyé à votre email." });
+        }
+
+        [HttpPost("admin/login")]
+        public IActionResult AdminLogin([FromBody] LoginRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = "Des données invalides ont été fournies." });
+            }
+
+            // Rechercher l'utilisateur par email
+            var utilisateur = _dbContext.Utilisateurs.FirstOrDefault(u => u.Email == request.Email && u.DateCreation != null);
+
+            if (utilisateur == null)
+            {
+                return BadRequest(new { message = "Email non reconnu." });
+            }
+
+            // Vérifier si l'utilisateur est un admin
+            var isAdmin = _dbContext.UtilisateurRoles
+                .Any(ur => ur.UtilisateurId == utilisateur.Id && ur.Role.Nom == "admin");
+
+            if (!isAdmin)
+            {
+                return BadRequest(new { message = "Seuls les administrateurs peuvent utiliser cette méthode de connexion." });
+            }
+
+            // Vérifier le mot de passe
+            if (!HashUtility.VerifyHash(request.MotDePasse, utilisateur.MotDePasse))
+            {
+                return BadRequest(new { message = "Mot de passe erroné." });
+            }
+
+            // Générer un token d'action (ici un exemple de token)
+            var token = _sessionService.GenerateSession(utilisateur.Id).Token;
+
+            return Ok(new { message = "Connexion valide:vous etes maintenant connecte", token });
         }
     }
     

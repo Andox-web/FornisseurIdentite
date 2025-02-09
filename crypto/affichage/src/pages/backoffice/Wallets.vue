@@ -71,7 +71,28 @@
       this.fetchAllData();
     },
     methods: {
+      async refreshToken() {
+        const token = localStorage.getItem('auth_token');
+        try {
+          const response = await axios.get('http://localhost:5000/refresh-connection', {
+            params: { token }
+          });
+          if (response.data.IsValid) {
+            localStorage.setItem('auth_token', response.data.Token);
+          } else {
+            localStorage.removeItem('auth_token');
+            alert(response.data.message);
+            window.location.href = '/';
+          }
+        } catch (error) {
+          console.error('Error refreshing token:', error);
+          localStorage.removeItem('auth_token');
+          alert('Erreur lors de la mise à jour du token');
+          window.location.href = '/';
+        }
+      },
       async fetchAllData() {
+        await this.refreshToken();
         try {
           const response = await fetch('http://localhost:8081/portefeuilleanalyse');
           const data = await response.json();
@@ -82,6 +103,7 @@
         }
       },
       async applyFilter() {
+        await this.refreshToken();
         if ((this.startDateTime && !this.endDateTime) || (!this.startDateTime && this.endDateTime)) {
           console.error('Les champs Date et Heure Début et Fin doivent être soit tous les deux remplis, soit tous les deux vides.');
           return;

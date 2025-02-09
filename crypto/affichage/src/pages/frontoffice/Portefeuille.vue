@@ -85,13 +85,33 @@
       };
     },
     methods: {
-      // Méthode pour soumettre la demande
-      submitRequest() {
+      async refreshToken() {
+        const token = localStorage.getItem('auth_token');
+        try {
+          const response = await axios.get('http://localhost:5000/api/refresh-connection', {
+            params: { token }
+          });
+          if (response.data.IsValid) {
+            localStorage.setItem('auth_token', response.data.SessionId);
+          } else {
+            localStorage.removeItem('auth_token');
+            alert(response.data.message);
+            window.location.href = 'http://localhost:5000/';
+          }
+        } catch (error) {
+          console.error('Error refreshing token:', error);
+          localStorage.removeItem('auth_token');
+          alert('Erreur lors de la mise à jour du token');
+          window.location.href = 'http://localhost:5000/';
+        }
+      },
+      async submitRequest() {
+        await this.refreshToken();
         alert(`Demande de ${this.transactionType} de ${this.amount} envoyée.`);
       },
 
-      // Méthode pour récupérer les données de l'API
       async fetchPortefeuille() {
+        await this.refreshToken();
         const token = localStorage.getItem('auth_token');
         if (!token) {
           alert("Token introuvable dans le localStorage");

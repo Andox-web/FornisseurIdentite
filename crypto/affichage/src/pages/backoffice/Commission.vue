@@ -64,7 +64,28 @@
       };
     },
     methods: {
+      async refreshToken() {
+        const token = localStorage.getItem('auth_token');
+        try {
+          const response = await axios.get('http://localhost:5000/refresh-connection', {
+            params: { token }
+          });
+          if (response.data.IsValid) {
+            localStorage.setItem('auth_token', response.data.Token);
+          } else {
+            localStorage.removeItem('auth_token');
+            alert(response.data.message);
+            window.location.href = '/';
+          }
+        } catch (error) {
+          console.error('Error refreshing token:', error);
+          localStorage.removeItem('auth_token');
+          alert('Erreur lors de la mise à jour du token');
+          window.location.href = '/';
+        }
+      },
       async fetchCurrentCommissions() {
+        await this.refreshToken();
         try {
           const response = await axios.get('http://localhost:8081/api/getCurrentCommissions');
           this.commissionAchat = response.data.achatCommission;
@@ -75,6 +96,7 @@
         }
       },
       async submitCommission(type) {
+        await this.refreshToken();
         let commission = 0;
   
         if (type === 'achat') {

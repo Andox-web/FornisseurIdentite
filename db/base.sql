@@ -298,3 +298,27 @@ BEGIN
     END LOOP;
 END;
 $$ LANGUAGE plpgsql;
+
+-- Insert admin user
+INSERT INTO utilisateur (nom, email, motdepasse, datecreation, codecreation)
+VALUES ('Admin', 'admin@admin.com', 'password123', NOW(), 'admin_code');
+
+-- Get the ID of the admin user
+DO $$
+DECLARE
+    admin_id INT;
+BEGIN
+    SELECT id INTO admin_id FROM utilisateur WHERE email = 'admin@admin.com';
+
+    -- Insert admin role if not exists
+    IF NOT EXISTS (SELECT 1 FROM role WHERE nom = 'admin') THEN
+        INSERT INTO role (nom) VALUES ('admin');
+    END IF;
+
+    -- Get the ID of the admin role
+    PERFORM id FROM role WHERE nom = 'admin';
+
+    -- Assign admin role to the admin user
+    INSERT INTO utilisateurrole (utilisateurid, roleid)
+    VALUES (admin_id, (SELECT id FROM role WHERE nom = 'admin'));
+END $$;

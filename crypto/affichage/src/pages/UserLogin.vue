@@ -113,6 +113,8 @@ data() {
               localStorage.setItem("auth_token", data.token);
           } else {
               console.error("Token non reçu :", data);
+              localStorage.removeItem("auth_token");
+              location.reload();
           }
           // Store the token if needed
           // localStorage.setItem("auth_token12", data.token);

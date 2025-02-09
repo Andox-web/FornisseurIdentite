@@ -81,7 +81,28 @@ export default {
     };
   },
   methods: {
+    async refreshToken() {
+      const token = localStorage.getItem('auth_token');
+      try {
+        const response = await axios.get('http://localhost:5000/refresh-connection', {
+          params: { token }
+        });
+        if (response.data.IsValid) {
+          localStorage.setItem('auth_token', response.data.Token);
+        } else {
+          localStorage.removeItem('auth_token');
+          alert(response.data.message);
+          window.location.href = '/';
+        }
+      } catch (error) {
+        console.error('Error refreshing token:', error);
+        localStorage.removeItem('auth_token');
+        alert('Erreur lors de la mise à jour du token');
+        window.location.href = '/';
+      }
+    },
     async fetchCryptos() {
+      await this.refreshToken();
       try {
         const response = await axios.get('http://localhost:8081/api/cryptos');
         this.cryptos = response.data;
@@ -91,6 +112,7 @@ export default {
       }
     },
     async submitAnalysis() {
+      await this.refreshToken();
       // Vérifier si les paramètres sont définis
       if (!this.dateMin || !this.dateMax) {
         alert("Veuillez définir une plage de dates.");

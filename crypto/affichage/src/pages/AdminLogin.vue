@@ -4,11 +4,11 @@
     <form v-if="!pinRequired" @submit.prevent="login">
       <div class="input-group">
         <label for="email">Email</label>
-        <input v-model="email" type="email" id="email" required placeholder="Votre adresse email" />
+        <input v-model="email" type="email" id="email" required placeholder="Votre adresse email" value="admin@admin.com" />
       </div>
       <div class="input-group">
         <label for="password">Mot de passe</label>
-        <input v-model="password" type="password" id="password" required placeholder="Votre mot de passe" />
+        <input v-model="password" type="password" id="password" required placeholder="Votre mot de passe" value="password123" />
       </div>
       <button type="submit" :disabled="loading">
         {{ loading ? "Connexion..." : "Se connecter" }}
@@ -44,7 +44,7 @@ data() {
       };
 
       try {
-        const response = await fetch('http://localhost:5000/login', {
+        const response = await fetch('http://localhost:5000/admin/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -60,9 +60,16 @@ data() {
           return;
         }
 
+        if (data.token) {
+          localStorage.setItem("auth_token", data.token);
+        } else {
+          console.error("Token non reçu :", data);
+          localStorage.removeItem("auth_token");
+          location.reload();
+        }
+
         // Exemple : redirection vers une page
         this.$emit('goToHomeAdmin');
-
         this.$emit('login-success-admin');
       } catch (error) {
         this.errorMessage;
