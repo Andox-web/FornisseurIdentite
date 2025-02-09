@@ -66,8 +66,48 @@
 import ChartCard from 'src/components/Cards/ChartCard.vue';
 import LTable from 'src/components/Table.vue';
 import Card from '../../components/Cards/Card.vue';
+import SockJS from "sockjs-client";
+import { Client } from "@stomp/stompjs";
 
 export default {
+  data() {
+    return {
+      selectedCrypto: "Bitcoin",
+      cryptos: ["Bitcoin", "Ethereum", "BNB", "Solana"],
+      tableData: {
+        data: [] // On initialise avec un tableau vide
+      },
+      stompClient: null
+    };
+  },
+  methods: {
+    connectWebSocket() {
+      const socket = new SockJS("/crypto-websocket");
+      this.stompClient = new Client({
+        webSocketFactory: () => socket,
+        reconnectDelay: 5000,
+        debug: (msg) => console.log(msg)
+      });
+
+      this.stompClient.onConnect = () => {
+        console.log("Connecté au WebSocket");
+
+        // Écouter les mises à jour de crypto
+        this.stompClient.subscribe("/topic/crypto", (message) => {
+          const updatedData = JSON.parse(message.body);
+          console.log("Mise à jour des cryptos reçue :", updatedData);
+
+          // Mettre à jour l'affichage des données
+          this.tableData.data = updatedData;
+        });
+      };
+
+      this.stompClient.activate();
+    }
+  },
+  mounted() {
+    this.connectWebSocket();
+  },
   components: {
     LTable,
     ChartCard,
