@@ -7,7 +7,7 @@ CREATE TABLE utilisateur (
     motdepasse TEXT NOT NULL,
     datecreation  TIMESTAMP  DEFAULT NULL,
     codecreation TEXT UNIQUE NOT NULL,
-    photo BYTEA
+    photo VARCHAR(255)
 );
 
 CREATE TABLE role (
