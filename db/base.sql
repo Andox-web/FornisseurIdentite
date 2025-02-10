@@ -300,8 +300,9 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Insert admin user
+-- mot de passe password123
 INSERT INTO utilisateur (nom, email, motdepasse, datecreation, codecreation)
-VALUES ('Admin', 'admin@admin.com', 'password123', NOW(), 'admin_code');
+VALUES ('Admin', 'admin@admin.com', 'AQAAAAIAAYagAAAAEMt9mrvqSHs07FaeqdUBAYLyjsM36evSIJfnbzv5CAifgJzeEEo8rr6C7+iw5fThjQ==', NOW(), 'admin_code');
 
 -- Get the ID of the admin user
 DO $$
@@ -322,3 +323,26 @@ BEGIN
     INSERT INTO utilisateurrole (utilisateurid, roleid)
     VALUES (admin_id, (SELECT id FROM role WHERE nom = 'admin'));
 END $$;
+
+
+-- Fonction pour insérer un portefeuille fiat et crypto après l'insertion d'un utilisateur
+CREATE OR REPLACE FUNCTION create_user_wallet()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Création du portefeuille fiat avec un solde initial de 0
+    INSERT INTO portemonnaiefiat (utilisateurid, quantite)
+    VALUES (NEW.id, 0);
+    
+    -- Création des portefeuilles crypto pour toutes les cryptomonnaies disponibles
+    INSERT INTO portemonnaiecrypto (utilisateurid, cryptomonnaieid, quantite)
+    SELECT NEW.id, id, 0 FROM cryptomonnaie;
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger pour exécuter la fonction après l'insertion d'un utilisateur
+CREATE TRIGGER trigger_create_user_wallet
+AFTER INSERT ON utilisateur
+FOR EACH ROW
+EXECUTE FUNCTION create_user_wallet();
