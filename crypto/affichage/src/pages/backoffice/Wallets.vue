@@ -74,14 +74,13 @@
       async refreshToken() {
         const token = localStorage.getItem('auth_token');
         try {
-          const response = await axios.get('http://localhost:5000/refresh-connection', {
-            params: { token }
-          });
-          if (response.data.IsValid) {
-            localStorage.setItem('auth_token', response.data.Token);
+          const response = await fetch(`http://localhost:5000/refresh-connection?token=${token}`);
+          const data = await response.json();
+          if (data.IsValid) {
+            localStorage.setItem('auth_token', data.Token);
           } else {
             localStorage.removeItem('auth_token');
-            alert(response.data.message);
+            alert(data.message);
             window.location.href = '/';
           }
         } catch (error) {

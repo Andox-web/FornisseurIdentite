@@ -51,7 +51,6 @@
   
   <script>
   import Card from 'src/components/Cards/Card.vue';
-  import axios from 'axios';
   
   export default {
     components: {
@@ -67,14 +66,13 @@
       async refreshToken() {
         const token = localStorage.getItem('auth_token');
         try {
-          const response = await axios.get('http://localhost:5000/refresh-connection', {
-            params: { token }
-          });
-          if (response.data.IsValid) {
-            localStorage.setItem('auth_token', response.data.Token);
+          const response = await fetch(`http://localhost:5000/refresh-connection?token=${token}`);
+          const data = await response.json();
+          if (data.IsValid) {
+            localStorage.setItem('auth_token', data.Token);
           } else {
             localStorage.removeItem('auth_token');
-            alert(response.data.message);
+            alert(data.message);
             window.location.href = '/';
           }
         } catch (error) {
@@ -87,9 +85,10 @@
       async fetchCurrentCommissions() {
         await this.refreshToken();
         try {
-          const response = await axios.get('http://localhost:8081/api/getCurrentCommissions');
-          this.commissionAchat = response.data.achatCommission;
-          this.commissionVente = response.data.venteCommission;
+          const response = await fetch('http://localhost:8081/api/getCurrentCommissions');
+          const data = await response.json();
+          this.commissionAchat = data.achatCommission;
+          this.commissionVente = data.venteCommission;
         } catch (error) {
           console.error('Error fetching current commissions:', error);
           alert('Erreur lors de la récupération des commissions actuelles');
@@ -106,9 +105,15 @@
         }
   
         try {
-          await axios.post('http://localhost:8081/api/updateCommission', {
-            achatCommission: type === 'achat' ? commission : this.commissionAchat,
-            venteCommission: type === 'vente' ? commission : this.commissionVente
+          await fetch('http://localhost:8081/api/updateCommission', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              achatCommission: type === 'achat' ? commission : this.commissionAchat,
+              venteCommission: type === 'vente' ? commission : this.commissionVente
+            })
           });
           alert(`${type === 'achat' ? 'Commission d\'achat' : 'Commission de vente'} modifiée à ${commission}%`);
         } catch (error) {

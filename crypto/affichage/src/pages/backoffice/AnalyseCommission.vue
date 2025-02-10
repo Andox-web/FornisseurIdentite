@@ -61,7 +61,6 @@
   
   <script>
   import Card from 'src/components/Cards/Card.vue';
-  import axios from 'axios';
   
   export default {
     components: {
@@ -87,14 +86,13 @@
       async refreshToken() {
         const token = localStorage.getItem('auth_token');
         try {
-          const response = await axios.get('http://localhost:5000/refresh-connection', {
-            params: { token }
-          });
-          if (response.data.IsValid) {
-            localStorage.setItem('auth_token', response.data.Token);
+          const response = await fetch(`http://localhost:5000/refresh-connection?token=${token}`);
+          const data = await response.json();
+          if (data.IsValid) {
+            localStorage.setItem('auth_token', data.Token);
           } else {
             localStorage.removeItem('auth_token');
-            alert(response.data.message);
+            alert(data.message);
             window.location.href = '/';
           }
         } catch (error) {
@@ -107,8 +105,9 @@
       async fetchCryptos() {
         await this.refreshToken();
         try {
-          const response = await axios.get('http://localhost:8081/api/cryptos');
-          this.cryptos = response.data;
+          const response = await fetch('http://localhost:8081/api/cryptos');
+          const data = await response.json();
+          this.cryptos = data;
         } catch (error) {
           console.error('Error fetching cryptos:', error);
         }
@@ -122,13 +121,20 @@
         }
   
         try {
-          const response = await axios.post('http://localhost:8081/api/analyseCommission', {
-            typeAnalyse: this.typeAnalyse,
-            selectedCrypto: this.selectedCrypto,
-            dateMin: this.dateMin,
-            dateMax: this.dateMax
+          const response = await fetch('http://localhost:8081/api/analyseCommission', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              typeAnalyse: this.typeAnalyse,
+              selectedCrypto: this.selectedCrypto,
+              dateMin: this.dateMin,
+              dateMax: this.dateMax
+            })
           });
-          this.result = response.data.result;
+          const data = await response.json();
+          this.result = data.result;
         } catch (error) {
           console.error('Error performing analysis:', error);
         }
