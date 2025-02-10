@@ -20,13 +20,14 @@ builder.Services.AddControllers(options =>
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowLocalhost", builder =>
+    options.AddPolicy("AllowAll", builder =>
     {
-        builder.WithOrigins("http://localhost:8082")  // Allow frontend origin
+        builder.AllowAnyOrigin()  // Autoriser toutes les origines
                .AllowAnyMethod()
                .AllowAnyHeader();
     });
 });
+
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseLowerCaseNamingConvention()
@@ -45,7 +46,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowLocalhost"); 
+app.UseCors("AllowAll"); 
 
 // app.UseCors(
 //         options => options.WithOrigins("http://localhost:8082").AllowAnyMethod()
