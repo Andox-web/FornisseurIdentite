@@ -302,7 +302,7 @@ $$ LANGUAGE plpgsql;
 -- Insert admin user
 -- mot de passe password123
 INSERT INTO utilisateur (nom, email, motdepasse, datecreation, codecreation)
-VALUES ('Admin', 'admin@admin.com', 'AQAAAAIAAYagAAAAEMt9mrvqSHs07FaeqdUBAYLyjsM36evSIJfnbzv5CAifgJzeEEo8rr6C7+iw5fThjQ==', NOW(), 'admin_code');
+VALUES ('Admin', 'admin@admin.com', 'NAhEQVIv3b62HpvA6jf99KMAb0+JVOmWJGf6k3K6gL7Nyk3ssWHvsk7F4OypYU+P', NOW(), 'admin_code');
 
 -- Get the ID of the admin user
 DO $$
