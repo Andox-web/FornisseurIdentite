@@ -103,7 +103,7 @@ namespace FournisseurIdentite.Controllers
                 Message = "Token valide",
                 IsValid = true,
                 SessionId = newSession.Id,
-                token = newSession.Token
+                token = newSession.Token,
                 UtilisateurId = newSession.UtilisateurId,
                 ExpireAt = newSession.ExpireAt
             });
