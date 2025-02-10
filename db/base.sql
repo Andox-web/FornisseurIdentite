@@ -145,7 +145,6 @@ CREATE TABLE transaction (
     cryptomonnaieid INT REFERENCES cryptomonnaie(id) ON DELETE CASCADE,
     quantitecrypto NUMERIC(20, 8) NOT NULL,
     isconfirmed BOOLEAN DEFAULT FALSE,
-    isconfirmedAdmin BOOLEAN DEFAULT FALSE,
     datetransaction TIMESTAMP DEFAULT NOW()
 );
 
