@@ -1,5 +1,10 @@
 # FornisseurIdentite
-pour demarer , lancer dockercompose -d --build 
+pour demarer , lancer :
+    dockercompose -d --build
+    cd crypto/affichage
+    npm run build
+    npx serve -s dist
+
 
 techno:
     -Fournisseur d'identite : .NET
