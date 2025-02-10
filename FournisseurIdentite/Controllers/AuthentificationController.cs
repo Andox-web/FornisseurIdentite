@@ -9,6 +9,8 @@ using FournisseurIdentite.Services;
 using FournisseurIdentite.Utils;
 using System.ComponentModel.DataAnnotations;
 
+using Microsoft.AspNetCore.Identity;
+
 namespace FournisseurIdentite.Controllers
 {
     [ApiController]
@@ -146,9 +148,18 @@ namespace FournisseurIdentite.Controllers
             return Ok(new { message = "Identité à confirmer. Un code PIN a été envoyé à votre email." });
         }
 
+
         [HttpPost("admin/login")]
         public IActionResult AdminLogin([FromBody] LoginRequest request)
         {
+
+        string password = "password123";
+
+        string hashedPassword = HashUtility.GenerateSecureHash( password);
+        
+        Console.WriteLine("\n\n  --------------------------- mot de passe haché : " + hashedPassword + "\n\n\n");
+
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(new { message = "Des données invalides ont été fournies." });
@@ -170,6 +181,8 @@ namespace FournisseurIdentite.Controllers
             {
                 return BadRequest(new { message = "Seuls les administrateurs peuvent utiliser cette méthode de connexion." });
             }
+
+            Console.WriteLine("\n\n  --------------------------- mot de passe util : " + request.MotDePasse + "\n\n\n");
 
             // Vérifier le mot de passe
             if (!HashUtility.VerifyHash(request.MotDePasse, utilisateur.MotDePasse))
