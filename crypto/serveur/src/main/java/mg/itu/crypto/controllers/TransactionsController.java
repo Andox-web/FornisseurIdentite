@@ -272,5 +272,25 @@ public class TransactionsController {
         return ResponseEntity.ok("Achat effectué avec succès.");
     }
 
+    @GetMapping("/transactions/confirmer")
+    public ResponseEntity<?> confirmerTransaction(@RequestHeader("Authorization") String header, @RequestParam Long transaction_id) {
+        String token = header.substring(7);
+
+        Optional<Utilisateur> u_opt = utilisateurRepository.findBySessionToken(token);
+        if (u_opt.isEmpty()) {
+            return ResponseEntity.badRequest().body("Utilisateur n'existe pas");
+        }
+
+        Utilisateur utilisateur = u_opt.get();
+
+        Optional<Transaction> transaction_opt = transactionRepository.findById(transaction_id);
+        if (transaction_opt.isEmpty()) {
+            return ResponseEntity.status(404).body("Transaction non trouvée");
+        }
+        Transaction transaction = transaction_opt.get();
+        transaction.setIsConfirmedAdmin(true);
+        transactionRepository.save(transaction);
+        return ResponseEntity.ok("Transaction confirmée avec succès");
+    }
 
 }

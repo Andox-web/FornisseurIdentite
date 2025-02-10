@@ -145,11 +145,12 @@ CREATE TABLE transaction (
     cryptomonnaieid INT REFERENCES cryptomonnaie(id) ON DELETE CASCADE,
     quantitecrypto NUMERIC(20, 8) NOT NULL,
     isconfirmed BOOLEAN DEFAULT FALSE,
+    isconfirmedAdmin BOOLEAN DEFAULT FALSE,
     datetransaction TIMESTAMP DEFAULT NOW()
 );
 
 CREATE TABLE Commission (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     achat_commission DECIMAL(19, 4) DEFAULT 0.0,
     vente_commission DECIMAL(19, 4) DEFAULT 0.0,
     crypto_id BIGINT,

@@ -12,9 +12,20 @@ public interface CommissionRepository extends JpaRepository<Commission, Long> {
 
     Optional<Commission> findFirstByOrderByIdAsc();
 
-    @Query("SELECT SUM(c.achatCommission + c.venteCommission) FROM Commission c WHERE c.date BETWEEN :dateMin AND :dateMax AND (:selectedCrypto = 'tous' OR c.crypto.id = :selectedCrypto)")
-    BigDecimal calculateSum(String selectedCrypto, LocalDateTime dateMin, LocalDateTime dateMax);
+@Query("""
+    SELECT SUM(c.achatCommission + c.venteCommission)
+    FROM Commission c
+    WHERE c.date BETWEEN :dateMin AND :dateMax
+    AND (:selectedCrypto IS NULL OR c.crypto.id = CAST(:selectedCrypto AS long))
+    """)
+BigDecimal calculateSum(String selectedCrypto, LocalDateTime dateMin, LocalDateTime dateMax);
 
-    @Query("SELECT AVG(c.achatCommission + c.venteCommission) FROM Commission c WHERE c.date BETWEEN :dateMin AND :dateMax AND (:selectedCrypto = 'tous' OR c.crypto.id = :selectedCrypto)")
+
+    @Query("""
+    SELECT AVG(c.achatCommission + c.venteCommission)
+    FROM Commission c
+    WHERE c.date BETWEEN :dateMin AND :dateMax
+    AND (:selectedCrypto IS NULL OR c.crypto.id = CAST(:selectedCrypto AS long))
+    """)
     BigDecimal calculateAverage(String selectedCrypto, LocalDateTime dateMin, LocalDateTime dateMax);
-}
+}   

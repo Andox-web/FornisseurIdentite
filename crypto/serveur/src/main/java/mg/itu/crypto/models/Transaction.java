@@ -36,6 +36,9 @@ public class Transaction {
     private Boolean isConfirmed = false;
 
     @Column(nullable = false)
+    private Boolean isConfirmedAdmin = false;
+
+    @Column(nullable = false)
     private LocalDateTime dateTransaction = LocalDateTime.now();
 
     // Getters and Setters
