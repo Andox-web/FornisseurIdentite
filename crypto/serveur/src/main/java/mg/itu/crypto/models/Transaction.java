@@ -35,8 +35,6 @@ public class Transaction {
     @Column(nullable = false)
     private Boolean isConfirmed = false;
 
-    @Column(nullable = false)
-    private Boolean isConfirmedAdmin = false;
 
     @Column(nullable = false)
     private LocalDateTime dateTransaction = LocalDateTime.now();
