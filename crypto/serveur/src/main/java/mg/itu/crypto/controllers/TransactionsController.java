@@ -267,6 +267,7 @@ public class TransactionsController {
         transaction.setUtilisateur(utilisateur);
         transaction.setQuantitecrypto(quantite);
         transaction.setCryptomonnaie(crypto);
+        transaction.setIsConfirmed(true);
         transactionRepository.save(transaction);
 
         return ResponseEntity.ok("Achat effectué avec succès.");
@@ -288,7 +289,7 @@ public class TransactionsController {
             return ResponseEntity.status(404).body("Transaction non trouvée");
         }
         Transaction transaction = transaction_opt.get();
-        transaction.setIsConfirmedAdmin(true);
+        transaction.setIsConfirmed(true);
         transactionRepository.save(transaction);
         return ResponseEntity.ok("Transaction confirmée avec succès");
     }
